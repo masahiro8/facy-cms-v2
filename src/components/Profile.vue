@@ -1,61 +1,68 @@
 <template>
-  <div class="login">
-    <v-form ref="form" v-model="valid" lazy-validation>
-      <v-text-field
-        class="cols-4"
-        v-model="email"
-        :rules="emailRules"
-        label="メールアドレス"
-        required
-      ></v-text-field>
+  <v-form ref="form" v-model="valid" lazy-validation class="profile">
+    <v-text-field
+      v-model="name"
+      :rules="nameRules"
+      label="名前"
+      required
+    ></v-text-field>
 
-      <v-text-field
-        class="cols-4"
-        v-model="password"
-        :rules="passwordRules"
-        type="password"
-        label="パスワード"
-        required
-      ></v-text-field>
-    </v-form>
-    <div class="button-container">
-      <v-btn color="error" class="button mr-4">　ログイン　</v-btn>
-    </div>
-  </div>
+    <v-text-field
+      v-model="email"
+      :rules="emailRules"
+      label="メールアドレス"
+      required
+    ></v-text-field>
+
+    <v-select
+      v-model="select"
+      :items="items"
+      :rules="[(v) => !!v || '権限を選択してください']"
+      label="権限"
+      required
+    ></v-select>
+
+    <v-btn color="error" class="mr-4 update-btn" @click="updateProfile">
+      更新
+    </v-btn>
+  </v-form>
 </template>
+  
 
 <script>
 export default {
   data: () => ({
-    valid: false,
+    valid: true,
+    name: "",
+    nameRules: [
+      (v) => !!v || "名前の入力は必須です",
+      (v) => !!v || "名前を入力してください",
+    ],
     email: "",
     emailRules: [
       (v) => !!v || "メールアドレスの入力は必須です",
-      (v) => /.+@.+/.test(v) || "有効なメールアドレスを入力してください",
+      (v) => /.+@.+\..+/.test(v) || "有効なメールアドレスを入力してください",
     ],
-    password: "",
-    passwordRules: [
-      (v) => !!v || "パスワードの入力は必須です",
-      (v) => 8 <= v.length || "８文字以上の有効なパスワードを入力してください",
-    ],
+    select: null,
+    items: ["管理者", "マーケッター", "サポーター"],
   }),
+
+  methods: {
+    updateProfile() {
+      alert("アップデートに成功しました");
+    },
+  },
 };
 </script>
 
 <style lang="scss" scoped>
-.login {
+.profile {
   padding: 20px;
   width: 300px;
   margin: 200px auto;
 
-  .button-container {
-    text-align: center;
-    margin-top: 50px;
-    .button {
-      background-color: red;
-      color: white;
-      width: 100%;
-    }
+  .update-btn {
+    width: 100%;
   }
 }
 </style>
