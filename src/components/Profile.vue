@@ -30,7 +30,8 @@
   
 
 <script>
-import userRoll from "../../public/json/config_user_roll.json";
+// import userRoll from "../../public/json/config_user_roll.json";
+import axios from "axios";
 
 export default {
   data: () => ({
@@ -46,13 +47,26 @@ export default {
       (v) => /.+@.+\..+/.test(v) || "有効なメールアドレスを入力してください",
     ],
     select: null,
+    sample: "",
     items: [
-      userRoll.ADMIN.label.ja,
-      userRoll.MARKETER.label.ja,
-      userRoll.SUPPORT.label.ja,
+      // response.data.users[0].name,
+      // userRoll.MARKETER.label.ja,
+      // userRoll.SUPPORT.label.ja,
     ],
   }),
-
+  mounted() {
+    this.axios
+      .get("json/users.json")
+      .then((response) => {
+        const sample2 = response.data.users[0].name;
+        this.items.push(sample2);
+        console.log(response.data.users[0].name);
+        console.log(response.data);
+      })
+      .catch((e) => {
+        console.log("error");
+      });
+  },
   methods: {
     updateProfile() {
       alert("アップデートに成功しました");
