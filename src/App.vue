@@ -1,8 +1,10 @@
 <template>
   <div id="app">
-    <!-- <Login /> -->
-    <!-- <ResetPassword /> -->
-    <Profile />
+    <v-app>
+      <!-- <Login /> -->
+      <!-- <ResetPassword /> -->
+      <Profile />
+    </v-app>
   </div>
 </template>
 
