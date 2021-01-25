@@ -30,7 +30,7 @@
   
 
 <script>
-import user from "../../public/json/config_user_roll.json";
+import userRoll from "../../public/json/config_user_roll.json";
 
 export default {
   data: () => ({
@@ -46,7 +46,11 @@ export default {
       (v) => /.+@.+\..+/.test(v) || "有効なメールアドレスを入力してください",
     ],
     select: null,
-    items: [user.ADMIN.label.ja, user.MARKETER.label.ja, user.SUPPORT.label.ja],
+    items: [
+      userRoll.ADMIN.label.ja,
+      userRoll.MARKETER.label.ja,
+      userRoll.SUPPORT.label.ja,
+    ],
   }),
 
   methods: {
