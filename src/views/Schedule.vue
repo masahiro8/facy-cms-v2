@@ -1,18 +1,19 @@
 <template>
   <div class="schedule">
     <ScheduleHeader
-      @date-range="setDateRange"
-      @sort-key="setSortKey"
-      @sort-order="setSortOrder"
+      @date-range="changeDateRange"
+      @sort-key="changeSortKey"
+      @sort-order="changeSortOrder"
     />
+    <v-divider></v-divider>
     <ScheduleTable :reservations="sorted" />
   </div>
 </template>
 <script>
 import * as _ from "lodash";
-import RESERVE from "../../public/json/reserve.json";
-import ScheduleHeader from "../components/ScheduleHeader.vue";
-import ScheduleTable from "../components/ScheduleTable.vue";
+import { Reserves } from "@/api/api";
+import ScheduleHeader from "@/components/ScheduleHeader.vue";
+import ScheduleTable from "@/components/ScheduleTable.vue";
 export default {
   name: "schedule",
   components: {
@@ -21,22 +22,33 @@ export default {
   },
   data: () => {
     return {
-      reserveData: RESERVE.reserve,
+      reserveData: null,
       dateRange: null,
       sortKey: null,
-      sortOrder: null,
+      sortOrder: "asc",
     };
   },
+  async mounted() {
+    this.getData();
+  },
   methods: {
-    setDateRange(value) {
+    async getData() {
+      const list = await Reserves().getReserves({
+        year: null,
+        month: null,
+        day: null,
+      });
+      this.reserveData = list;
+    },
+    changeDateRange(value) {
       //valueの値は順番が決まっていない
       //絞り込み期間の日付を昇順で並べ替えておく
       this.dateRange = _.sortBy(value);
     },
-    setSortKey(value) {
+    changeSortKey(value) {
       this.sortKey = value.value;
     },
-    setSortOrder(value) {
+    changeSortOrder(value) {
       this.sortOrder = value.value;
     },
   },

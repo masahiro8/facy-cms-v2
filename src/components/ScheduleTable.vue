@@ -37,11 +37,12 @@
           </div>
           <div class="reservation__edit">
             <v-btn icon>
-              <v-icon>{{ edit }}</v-icon>
+              <v-icon @click.stop="editorOpen = !editorOpen">{{ edit }}</v-icon>
             </v-btn>
           </div>
         </div>
       </div>
+      <ScheduleEdit :editorOpen="editorOpen"></ScheduleEdit>
     </div>
   </div>
 </template>
@@ -49,6 +50,7 @@
 <script>
 import { mdiMessageVideo } from "@mdi/js";
 import { mdiPencil } from "@mdi/js";
+import ScheduleEdit from "./ScheduleEdit.vue";
 
 export default {
   props: { reservations: Array },
@@ -56,7 +58,11 @@ export default {
     return {
       videoChat: mdiMessageVideo,
       edit: mdiPencil,
+      editorOpen: false,
     };
+  },
+  components: {
+    ScheduleEdit,
   },
 };
 </script>
