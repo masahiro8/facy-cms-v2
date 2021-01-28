@@ -21,12 +21,12 @@
             </v-btn>
           </div>
           <div class="table__check">
-            <v-checkbox v-model="weekData[index].active"></v-checkbox>
+            <v-checkbox v-model="day.active"></v-checkbox>
           </div>
           <div class="table__start-time">
             <v-select
               :items="selectTimeRange"
-              v-model="weekData[index].start_time"
+              v-model="day.start_time"
               filled
               dense
             ></v-select>
@@ -34,7 +34,7 @@
           <div class="table__end-time">
             <v-select
               :items="selectTimeRange"
-              v-model="weekData[index].end_time"
+              v-model="day.end_time"
               filled
               dense
             ></v-select>
@@ -42,8 +42,8 @@
           <div class="table__time">
             <v-select
               :items="selectTimeDuration"
-              item-text="`${weekData[index].time}分`"
-              v-model="weekData[index].time"
+              item-text="`${day.time}分`"
+              v-model="day.time"
               filled
               dense
             >
@@ -53,7 +53,7 @@
             </v-select>
           </div>
           <div class="table__edit">
-            <v-btn icon @click="openDrawer(weekData[index], index)">
+            <v-btn icon @click="openDrawer(day, index)">
               <v-icon>{{ edit }}</v-icon>
             </v-btn>
           </div>
