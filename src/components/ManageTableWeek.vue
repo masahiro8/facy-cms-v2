@@ -80,13 +80,13 @@
 </template>
 <script>
 import * as _ from "lodash";
-import CONFIG_SCHEDULE from "../../public/json/config_schedule.json";
 import Drawer from "./Drawer.vue";
 import ManageTableWeekDetails from "./ManageTableWeekDetails.vue";
 import { mdiPencil } from "@mdi/js";
 import { mdiClockTimeFourOutline } from "@mdi/js";
 import funcManageTable from "../funcManageTable.js";
 import { START_END_TIME_RANGE, DURATIONS } from "../const.js";
+import { DAY_OF_WEEK } from "../api/statics.js";
 
 // import manageTimetableHeader from "../components/manageTimetableHeader.vue";
 
@@ -95,6 +95,9 @@ export default {
   components: {
     Drawer,
     ManageTableWeekDetails,
+  },
+  props: {
+    configData: Object,
   },
   data() {
     return {
@@ -111,12 +114,21 @@ export default {
     };
   },
   mounted() {
-    this.weekData = CONFIG_SCHEDULE.day_of_week;
+    this.weekData = this.configData;
+  },
+  watch: {
+    // data()で入ってこないのでwatch
+    configData: {
+      immediate: true,
+      handler: function (newVal) {
+        this.weekData = newVal;
+      },
+    },
   },
   methods: {
     initEditStatus() {
       // 各日の編集状態init
-      const days = Object.keys(CONFIG_SCHEDULE.day_of_week);
+      const days = _.map(DAY_OF_WEEK, (day) => day.id);
       let obj = {};
       days.forEach((day) => {
         obj[day] = false;
