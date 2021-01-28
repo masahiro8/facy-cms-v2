@@ -1,64 +1,40 @@
 <template>
   <div class="manage-table">
-    <div class="manage-table-title">曜日</div>
+    <div class="manage-table-title">個別</div>
     <div class="manage-table-inner">
-      <div class="manage-table__header">
-        <div class="header__day"></div>
-        <div class="header__active"></div>
-        <div class="header__check"></div>
-        <div class="header__start-time">開始時刻</div>
-        <div class="header__end-time">終了時刻</div>
-        <div class="header__time">時間</div>
-        <div class="header__edit">詳細</div>
-      </div>
       <div class="manage-table__content">
-        <div class="timetable" v-for="(day, index) in weekData" :key="index">
-          <div class="table__day">
-            {{ funcManageTable.getJpDayShort(index) }}
-          </div>
-          <div class="table__active">
-            <v-icon title="編集中" v-show="editStatus[index]">{{
-              clock
-            }}</v-icon>
-          </div>
-          <div class="table__check">
-            <v-checkbox
-              v-model="day.active"
-              @change="onChange(index)"
-            ></v-checkbox>
-          </div>
-          <div class="table__start-time">
-            <v-select
-              :items="selectTimeRange"
-              v-model="day.start_time"
-              @change="onTimeChange(index)"
-              filled
-              dense
-            ></v-select>
-          </div>
-          <div class="table__end-time">
-            <v-select
-              :items="selectTimeRange"
-              v-model="day.end_time"
-              @change="onTimeChange(index)"
-              filled
-              dense
-            ></v-select>
-          </div>
-          <div class="table__time">
-            <v-select
-              :items="selectTimeDuration"
-              item-text="`${day.time}分`"
-              v-model="day.time"
-              @change="onTimeChange(index)"
-              filled
-              dense
-            >
-              <template v-slot:item="data">
-                <span>{{ data.item }}分</span>
-              </template>
-            </v-select>
-          </div>
+        <div class="manage-table__calendar-control">
+          <v-btn icon class="ma-2" @click="$refs.calendar.prev()">
+            Prev
+            <!-- <v-icon>mdi-chevron-left</v-icon> -->
+          </v-btn>
+          --
+          <!-- <v-spacer></v-spacer> -->
+          <v-btn icon class="ma-2" @click="$refs.calendar.next()">
+            Next
+            <!-- <v-icon>mdi-chevron-right</v-icon> -->
+          </v-btn>
+        </div>
+        <div class="manage-table__calendar">
+          <v-calendar
+            locale="ja-jp"
+            :day-format="(timestamp) => new Date(timestamp.date).getDate()"
+            :month-format="
+              (timestamp) => new Date(timestamp.date).getMonth() + 1 + ' /'
+            "
+            ref="calendar"
+            v-model="value"
+            :weekdays="weekday"
+            :type="type"
+            :events="events"
+            :event-overlap-mode="mode"
+            :event-overlap-threshold="30"
+            :event-color="getEventColor"
+            @change="getEvents"
+          ></v-calendar>
+        </div>
+
+        <div class="timetable" v-for="(day, index) in dateData" :key="index">
           <div class="table__edit">
             <v-btn icon @click="openDrawer(day, index)">
               <v-icon>{{ edit }}</v-icon>
@@ -100,8 +76,41 @@ export default {
   },
   data() {
     return {
+      type: "month",
+      types: ["month", "week", "day", "4day"],
+      mode: "stack",
+      modes: ["stack", "column"],
+      weekday: [0, 1, 2, 3, 4, 5, 6],
+      weekdays: [
+        { text: "Sun - Sat", value: [0, 1, 2, 3, 4, 5, 6] },
+        { text: "Mon - Sun", value: [1, 2, 3, 4, 5, 6, 0] },
+        { text: "Mon - Fri", value: [1, 2, 3, 4, 5] },
+        { text: "Mon, Wed, Fri", value: [1, 3, 5] },
+      ],
+      value: "",
+      events: [],
+      colors: [
+        "blue",
+        "indigo",
+        "deep-purple",
+        "cyan",
+        "green",
+        "orange",
+        "grey darken-1",
+      ],
+      names: [
+        "Meeting",
+        "Holiday",
+        "PTO",
+        "Travel",
+        "Event",
+        "Birthday",
+        "Conference",
+        "Party",
+      ],
+
       funcManageTable: funcManageTable,
-      weekData: {},
+      dateData: {},
       edit: mdiPencil,
       clock: mdiClockTimeFourOutline,
       selectTimeRange: START_END_TIME_RANGE, // 開始、終了時刻選択option
@@ -113,14 +122,14 @@ export default {
     };
   },
   mounted() {
-    this.weekData = this.configData;
+    this.dateData = this.configData;
   },
   watch: {
     // data()で入ってこないのでwatch
     configData: {
       immediate: true,
       handler: function (newVal) {
-        this.weekData = newVal;
+        this.dateData = newVal;
       },
     },
   },
@@ -141,8 +150,8 @@ export default {
     onTimeChange(index) {
       // 時間系の変更あれば変更日の時間枠を再生成
       console.log("onTimeCHange", index);
-      this.weekData[index].detail = this.funcManageTable.rebuildTimeTable(
-        this.weekData[index]
+      this.dateData[index].detail = this.funcManageTable.rebuildTimeTable(
+        this.dateData[index]
       );
       // 編集ステータス変更
       console.log("editStatus", this.editStatus[index]);
@@ -156,6 +165,18 @@ export default {
       this.editDayName = index;
       this.editDayData = dayData;
       this.drawerToggle = true;
+      // "date": {
+      //   "2020": {
+      //     "1": {
+      //       "1": {
+      //         "active": true,
+      //         "detail": [
+      //           {
+      //             "timeid": 1,
+      //             "active": true,
+      //             "start": "10:00",
+      //             "end": "10:30"
+      //           },
     },
     closeDrawer() {
       this.drawerToggle = false;
