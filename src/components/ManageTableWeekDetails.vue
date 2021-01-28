@@ -99,7 +99,7 @@ export default {
       }
     },
     // 枠時間の長さ変更後の時間枠list
-    resetEditTimTable() {
+    resetEditTimeTable() {
       const arr = this.detailStartTimes.map((_time, index) => {
         return {
           timeid: index + 1,
@@ -127,7 +127,7 @@ export default {
       () => [this.startTime, this.endTime, this.duration],
       (newValue, oldValue) => {
         if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
-          this.resetEditTimTable();
+          this.resetEditTimeTable();
         }
       }
     );
