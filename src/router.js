@@ -5,6 +5,7 @@ import Login from "./components/Login.vue";
 import ResetPassword from "./components/ResetPassword.vue";
 import Schedule from "./views/Schedule.vue";
 import ManageTable from "./views/ManageTable.vue";
+import Profile from "./components/Profile.vue";
 
 Vue.use(Router);
 
@@ -31,6 +32,11 @@ export default new Router({
       path: "/managetable",
       name: "ManageTable",
       component: ManageTable
+    },
+    {
+      path: "/profile",
+      name: "Profile",
+      component: Profile
     }
   ]
 });

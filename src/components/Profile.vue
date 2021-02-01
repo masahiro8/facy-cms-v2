@@ -16,23 +16,21 @@
 
     <v-select
       v-model="select"
-      :hint="`${select.state}, ${select.abbr}`"
       :items="items"
       :rules="[(v) => !!v || '権限を選択してください']"
       label="権限"
       required
-      item-text="state"
-      item-value="abbr"
+      item-text="label"
+      item-value="value"
       persistent-hint
       return-object
     ></v-select>
 
-    <v-btn color="error" class="mr-4 update-btn" @click="updateProfile">
+    <v-btn color="error" class="mr-4 update-btn" @click="updateProfile()">
       更新
     </v-btn>
   </v-form>
 </template>
-  
 
 <script>
 // import userRoll from "../../public/json/config_user_roll.json";
@@ -53,93 +51,57 @@ export default {
       (v) => !!v || "メールアドレスの入力は必須です",
       (v) => /.+@.+\..+/.test(v) || "有効なメールアドレスを入力してください",
     ],
-    select: { state: "", abbr: "" },
+    select: { label: "", value: "" },
     sample: "",
-    items: [],
+    items: [
+      { label: "管理者", value: "admin" },
+      { label: "マーケター", value: "marketer" },
+      { label: "サポーター", value: "support" },
+    ],
+    uid: "",
   }),
   mounted() {
     Users()
       .getUsers()
       .then((users) => {
+        console.log("users", users);
         const userItem = users.map((user) => {
           let userInfo = {};
           // TODO：レスポンスデータのrollが""のため一時的にstate、abbrにuser.emailを格納
-          userInfo.state = user.email;
-          userInfo.abbr = user.email;
+          // userInfo.state = user.email;
+          // userInfo.abbr = user.email;
+          userInfo = user.uid;
+          console.log(userInfo);
           return userInfo;
         });
-        this.items = userItem;
-        this.select = userItem[0];
+        this.uid = userItem;
+        // this.items = userItem;
+        // this.select = userItem[0];
+        console.log("userItem", userItem);
       })
       .catch((reject) => {
         console.log(reject);
       });
-
-    // console.log(updateUserProfile);
-    // console.log(Users);
-    // fetch("./api/users.js")
-    //   .then((response) => {
-    //     console.log(response);
-    //     // Do Something
-    //   })
-    //   .catch(function (error) {
-    //     console.log(error);
-    //   });
-    // this.axios
-    //   .get("json/config_user_roll.json")
-    //   .then((response) => {
-    //     console.log(response.data.ADMIN.label.ja);
-    //     console.log(response.data);
-    //     this.item.state = response.data.ADMIN.label.ja;
-    //     this.item.abbr = response.data.ADMIN.id;
-    //     this.item.abbr.push(response.data.ADMIN.id);
-    //     console.log("this.item.state", this.item.state);
-    //     console.log("this.item.abbr", this.item.abbr);
-    //   })
-    //   .catch((e) => {
-    //     console.log("error called");
-    //   });
-    // let items = [];
-    // this.axios
-    //   .get("json/users.json")
-    //   .then((response) => {
-    //     // console.log(response.data.users[1]);
-    //     const rollItem = _.forEach(response.data.users, (value, key) => {
-    //       console.log("value", value);
-    //       // console.log("key", key);
-    //       console.log("*", response.data.users);
-    //       // items.push({ [key]: _.assign(value) });
-    //       items.push({ [key]: _.assign(value) });
-    //     });
-    //   })
-    //   .catch((e) => {
-    //     console.log("error called");
-    //   });
-    // console.log(items);
-    // let categories = [];
-    // console.log("categories", categories);
-    // this.item = [];
-    // this.axios
-    //   .get("json/users.json")
-    //   .then((response) => {
-    //     const rollItem = _.forEach(response.data, (value, key) => {
-    //       console.log("value", value);
-    //       // console.log("key", key);
-    //       console.log("*", response.data.users);
-    //       // this.item.push(value);
-    //       // categories.psuh({ [key]: _.assign(value) });
-    //       this.item.psuh(response.data.users);
-    //       // console.log(categories);
-    //       var obj = {};
-    //       obj[key] = _.assign(value, response.data[key]);
-    //       console.log("value2", value);
-    //       this.item.push({ [key]: _.assign(value, response.data[key]) });
-    //     });
-    //     rollItem;
   },
   methods: {
-    updateProfile() {
+    async updateProfile() {
+      const params = {
+        uid: "7SEVfwqIiafwVt2AGVv4q9uNLYE3",
+        email: this.email,
+        name: this.name,
+        roll: this.select.value,
+      };
+      console.log("email", this.email);
+      console.log("name", this.name);
+      const result = await Users().updateUserProfile(params);
+
       alert("アップデートに成功しました");
+      this.clearForm();
+    },
+    clearForm() {
+      this.name = "";
+      this.email = "";
+      this.select = "";
     },
   },
 };

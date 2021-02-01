@@ -1,6 +1,7 @@
 <template>
   <v-app id="app">
     <GlobalHeader />
+    <Profile />
     <v-main>
       <v-container fluid>
         <router-view />
@@ -11,11 +12,13 @@
 
 <script>
 import GlobalHeader from "./components/GlobalHeader.vue";
+import Profile from "./components/Profile.vue"
 
 export default {
   name: "App",
   components: {
     GlobalHeader,
+    Profile,
   },
 };
 </script>
