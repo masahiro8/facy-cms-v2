@@ -62,6 +62,11 @@ export default {
       .getUsers()
       .then((users) => {
         console.log("users", users);
+
+        window.onload(() => {
+          this.name = "サンプルの名前";
+        });
+
         const userItem = users.map((user) => {
           let userInfo = {};
           userInfo = user.uid;
@@ -77,7 +82,8 @@ export default {
   methods: {
     async updateProfile() {
       const params = {
-        uid: this.uid[0], //　ここはログインしている人のuidを取れるようにする必要がある
+        // uid: this.uid[0], //　ここはログインしている人のuidを取れるようにする必要がある
+        uid: "7JzX7urSEpYSBka5GoOkFxCAlXD2",
         email: this.email,
         name: this.name,
         roll: this.select.value,
