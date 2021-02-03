@@ -11,6 +11,7 @@
         <v-btn to="/reset">パスワードリセット画面</v-btn>
         <v-btn to="/schedule">スケジュール画面</v-btn>
         <v-btn to="/managetable">予約可能日設定</v-btn>
+        <v-btn to="/update">アカウント更新</v-btn>
       </div>
     </v-container>
   </div>
