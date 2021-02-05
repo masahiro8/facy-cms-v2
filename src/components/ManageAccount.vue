@@ -35,9 +35,11 @@
             <td>{{ item.roll_label }}</td>
             <td>{{ item.name }}</td>
             <td>{{ item.email }}</td>
-            <v-btn icon @click="clickedEditIcon(item.uid)" class="edit-icon">
-              <v-icon>{{ editIcon }}</v-icon>
-            </v-btn>
+            <td>
+              <v-btn icon @click="clickedEditIcon(item.uid)" class="edit-icon">
+                <v-icon>{{ editIcon }}</v-icon>
+              </v-btn>
+            </td>
           </tr>
         </tbody>
       </template>
@@ -114,11 +116,11 @@ export default {
 <style lang="scss" scoped>
 .acount-container {
   .account {
-    margin-top: 80px;
+    margin-top: 40px;
   }
 
   .invite-btn {
-    margin: 40px 0 40px 10px;
+    margin: 10px 0 40px 10px;
   }
 
   .edit-icon {
