@@ -35,7 +35,8 @@
             <td>{{ item.roll_label }}</td>
             <td>{{ item.name }}</td>
             <td>{{ item.email }}</td>
-            <v-btn icon @click="clickedEditIcon()" class="edit-icon">
+            <!-- <td>{{ item.uid }}</td> -->
+            <v-btn icon @click="clickedEditIcon(item.uid)" class="edit-icon">
               <v-icon>{{ editIcon }}</v-icon>
             </v-btn>
           </tr>
@@ -66,16 +67,13 @@ export default {
     ],
     tempItems: [],
     editIcon: mdiPencil,
-    edit: "",
   }),
   mounted() {
     Users()
       .getUsers()
       .then((users) => {
         const userItem = users.map((user) => {
-          const edit1 = this.editIcon;
           let userInfo = {};
-          console.log("userInfo", userInfo);
           switch (user.roll) {
             case "admin":
               userInfo.roll_label = "管理者";
@@ -93,7 +91,7 @@ export default {
           userInfo.roll_value = user.roll;
           userInfo.name = user.username;
           userInfo.email = user.email;
-          userInfo.edit = edit1;
+          userInfo.uid = user.uid;
           return userInfo;
         });
         this.accountInfo = userItem;
@@ -113,8 +111,9 @@ export default {
         this.accountInfo = rollFiltered;
       }
     },
-    clickedEditIcon() {
-      alert("アカウント詳細へ");
+    clickedEditIcon(value) {
+      console.log(value);
+      alert("uid：" + value + "のアカウント詳細を表示");
     },
   },
 };
