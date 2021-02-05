@@ -58,12 +58,6 @@ export default {
       { label: "サポーター", value: "support" },
     ],
     accountInfo: [],
-    headers: [
-      { text: "権限", aligin: "start", sortable: false, value: "roll_label" },
-      { text: "名前", value: "name" },
-      { text: "メールアドレス", value: "email" },
-      { text: "編集アイコン", value: "edit" },
-    ],
     tempItems: [],
     editIcon: mdiPencil,
   }),
