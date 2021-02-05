@@ -35,7 +35,6 @@
             <td>{{ item.roll_label }}</td>
             <td>{{ item.name }}</td>
             <td>{{ item.email }}</td>
-            <!-- <td>{{ item.uid }}</td> -->
             <v-btn icon @click="clickedEditIcon(item.uid)" class="edit-icon">
               <v-icon>{{ editIcon }}</v-icon>
             </v-btn>
@@ -112,7 +111,6 @@ export default {
       }
     },
     clickedEditIcon(value) {
-      console.log(value);
       alert("uid：" + value + "のアカウント詳細を表示");
     },
   },
