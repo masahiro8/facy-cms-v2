@@ -34,7 +34,7 @@ export default new Router({
       component: ManageTable
     },
     {
-      path: "/update",
+      path: "/updateprofile",
       name: "UpdateAccount",
       component: UpdateProfile
     }
