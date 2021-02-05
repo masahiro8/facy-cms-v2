@@ -1,11 +1,6 @@
 <template>
   <v-form ref="form" v-model="valid" lazy-validation class="profile">
-    <v-text-field
-      v-model="name"
-      :rules="nameRules"
-      label="名前"
-      required
-    ></v-text-field>
+    <v-text-field v-model="name" :rules="nameRules" label="名前" required></v-text-field>
 
     <v-text-field
       v-model="email"
@@ -58,18 +53,18 @@ export default {
     uid: "",
   }),
   mounted() {
+    // window.addEventListener("load", (event) => {
+    //   console.log("page is fully loaded");
+    // });
+
     Users()
       .getUsers()
       .then((users) => {
         console.log("users", users);
-
-        window.onload(() => {
-          this.name = "サンプルの名前";
-        });
-
         const userItem = users.map((user) => {
           let userInfo = {};
-          userInfo = user.uid;
+          userInfo.id = user.uid;
+          // userInfo.name = "こんにちは";
           return userInfo;
         });
         this.uid = userItem;
@@ -80,6 +75,9 @@ export default {
       });
   },
   methods: {
+    // window: (onload = () => {
+    //   this.name = "名前を入れる";
+    // }),
     async updateProfile() {
       const params = {
         // uid: this.uid[0], //　ここはログインしている人のuidを取れるようにする必要がある
@@ -98,6 +96,11 @@ export default {
       this.email = "";
       this.select = "";
     },
+  },
+  beforeCreate() {
+    window.addEventListener("load", (event) => {
+      console.log("page is fully loaded");
+    });
   },
 };
 </script>

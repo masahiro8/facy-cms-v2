@@ -13,6 +13,9 @@ import VeeValidate, { Validator } from "vee-validate";
 // 日本語ファイルを読み込み
 import ja from "vee-validate/dist/locale/ja";
 
+// for firebase
+import { initFirebase } from "@/api/api";
+
 Vue.use(Vuetify);
 Vue.use(VeeValidate);
 
@@ -20,6 +23,9 @@ Vue.use(VeeValidate);
 const opts = {
   icons: { iconfont: "mdiSvg" }
 };
+
+// firebase
+initFirebase();
 
 // vee-validateの日本語
 Validator.localize("ja", ja);

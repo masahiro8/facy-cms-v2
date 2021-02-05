@@ -35,7 +35,7 @@ export default new Router({
     },
     {
       path: "/update",
-      name: "update",
+      name: "UpdateAccount",
       component: UpdateProfile
     }
   ]
