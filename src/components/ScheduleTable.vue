@@ -20,7 +20,7 @@
           <!-- <div>{{ reservation.id }}</div> -->
           <div class="reservation__chat">
             <v-btn icon>
-              <v-icon>{{ videoChat }}</v-icon>
+              <v-icon>{{ mdiVideoChat }}</v-icon>
             </v-btn>
           </div>
           <div class="reservation__date">{{ reservation.date }}</div>
@@ -37,27 +37,51 @@
           </div>
           <div class="reservation__edit">
             <v-btn icon>
-              <v-icon>{{ edit }}</v-icon>
+              <v-icon @click.stop="edit(reservation.id)">{{ mdiEdit }}</v-icon>
             </v-btn>
           </div>
         </div>
       </div>
+      <ScheduleEdit
+        :editorOpen="editorOpen"
+        :id="id"
+        @update="update"
+      ></ScheduleEdit>
     </div>
   </div>
 </template>
 
 <script>
+import * as _ from "lodash";
 import { mdiMessageVideo } from "@mdi/js";
 import { mdiPencil } from "@mdi/js";
+import ScheduleEdit from "./ScheduleEdit.vue";
 
 export default {
   props: { reservations: Array },
   data: () => {
     return {
-      videoChat: mdiMessageVideo,
-      edit: mdiPencil,
+      mdiVideoChat: mdiMessageVideo,
+      mdiEdit: mdiPencil,
+      editorOpen: false,
+      reservation: null,
+      id: null,
     };
   },
+  components: {
+    ScheduleEdit,
+  },
+  methods: {
+    edit(id) {
+      this.editorOpen = !this.editorOpen;
+      this.id = id;
+      this.$emit("edit", id);
+    },
+    update() {
+      this.$emit("update");
+    },
+  },
+  computed: {},
 };
 </script>
 

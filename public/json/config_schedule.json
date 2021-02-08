@@ -4,84 +4,42 @@
       "active": true,
       "start_time": "10:00",
       "end_time": "17:00",
-      "time": "15",
+      "time": "60",
       "detail": [
         {
           "timeid": 1,
           "active": true,
           "start": "10:00",
-          "end": "10:30"
+          "end": "11:00"
         },
         {
           "timeid": 2,
           "active": true,
-          "start": "10:30",
-          "end": "11:00"
+          "start": "11:00",
+          "end": "12:00"
         },
         {
           "timeid": 3,
           "active": true,
-          "start": "11:00",
-          "end": "11:30"
+          "start": "12:00",
+          "end": "13:00"
         },
         {
           "timeid": 4,
           "active": true,
-          "start": "11:30",
-          "end": "12:00"
+          "start": "13:00",
+          "end": "14:00"
         },
         {
           "timeid": 5,
           "active": true,
-          "start": "12:00",
-          "end": "12:30"
+          "start": "15:00",
+          "end": "16:00"
         },
         {
           "timeid": 6,
           "active": true,
-          "start": "12:30",
-          "end": "13:00"
-        },
-        {
-          "timeid": 7,
-          "active": true,
-          "start": "13:30",
-          "end": "14:00"
-        },
-        {
-          "timeid": 8,
-          "active": true,
-          "start": "14:00",
-          "end": "14:30"
-        },
-        {
-          "timeid": 9,
-          "active": true,
-          "start": "14:30",
-          "end": "15:00"
-        },
-        {
-          "timeid": 10,
-          "active": true,
-          "start": "15:00",
-          "end": "15:30"
-        },
-        {
-          "timeid": 11,
-          "active": true,
-          "start": "15:30",
-          "end": "16:00"
-        },
-        {
-          "timeid": 12,
-          "active": true,
           "start": "16:00",
-          "end": "16:30"
-        },
-        {
-          "timeid": 13,
-          "active": true,
-          "start": "16:30",
           "end": "17:00"
         }
       ]
@@ -433,7 +391,7 @@
     "Saturday": {
       "active": false,
       "start_time": "10:00",
-      "end_time": "17:00",
+      "end_time": "14:00",
       "time": "30",
       "detail": [
         {
@@ -477,50 +435,14 @@
           "active": true,
           "start": "13:30",
           "end": "14:00"
-        },
-        {
-          "timeid": 8,
-          "active": true,
-          "start": "14:00",
-          "end": "14:30"
-        },
-        {
-          "timeid": 9,
-          "active": true,
-          "start": "14:30",
-          "end": "15:00"
-        },
-        {
-          "timeid": 10,
-          "active": true,
-          "start": "15:00",
-          "end": "15:30"
-        },
-        {
-          "timeid": 11,
-          "active": true,
-          "start": "15:30",
-          "end": "16:00"
-        },
-        {
-          "timeid": 12,
-          "active": true,
-          "start": "16:00",
-          "end": "16:30"
-        },
-        {
-          "timeid": 13,
-          "active": true,
-          "start": "16:30",
-          "end": "17:00"
         }
       ]
     },
     "Sunday": {
       "active": false,
-      "start_time": "16:00",
-      "end_time": "18:00",
-      "time": "60",
+      "start_time": "10:00",
+      "end_time": "13:00",
+      "time": "30",
       "detail": [
         {
           "timeid": 1,
@@ -557,57 +479,18 @@
           "active": true,
           "start": "12:30",
           "end": "13:00"
-        },
-        {
-          "timeid": 7,
-          "active": true,
-          "start": "13:30",
-          "end": "14:00"
-        },
-        {
-          "timeid": 8,
-          "active": true,
-          "start": "14:00",
-          "end": "14:30"
-        },
-        {
-          "timeid": 9,
-          "active": true,
-          "start": "14:30",
-          "end": "15:00"
-        },
-        {
-          "timeid": 10,
-          "active": true,
-          "start": "15:00",
-          "end": "15:30"
-        },
-        {
-          "timeid": 11,
-          "active": true,
-          "start": "15:30",
-          "end": "16:00"
-        },
-        {
-          "timeid": 12,
-          "active": true,
-          "start": "16:00",
-          "end": "16:30"
-        },
-        {
-          "timeid": 13,
-          "active": true,
-          "start": "16:30",
-          "end": "17:00"
         }
       ]
     }
   },
   "date": {
-    "2020": {
-      "1": {
-        "1": {
+    "2021": {
+      "02": {
+        "22": {
           "active": true,
+          "start_time": "10:00",
+          "end_time": "13:00",
+          "time": "30",
           "detail": [
             {
               "timeid": 1,
@@ -644,48 +527,6 @@
               "active": true,
               "start": "12:30",
               "end": "13:00"
-            },
-            {
-              "timeid": 7,
-              "active": true,
-              "start": "13:30",
-              "end": "14:00"
-            },
-            {
-              "timeid": 8,
-              "active": true,
-              "start": "14:00",
-              "end": "14:30"
-            },
-            {
-              "timeid": 9,
-              "active": true,
-              "start": "14:30",
-              "end": "15:00"
-            },
-            {
-              "timeid": 10,
-              "active": true,
-              "start": "15:00",
-              "end": "15:30"
-            },
-            {
-              "timeid": 11,
-              "active": true,
-              "start": "15:30",
-              "end": "16:00"
-            },
-            {
-              "timeid": 12,
-              "active": true,
-              "start": "16:00",
-              "end": "16:30"
-            },
-            {
-              "timeid": 13,
-              "active": true,
-              "start": "16:30",
-              "end": "17:00"
             }
           ]
         }

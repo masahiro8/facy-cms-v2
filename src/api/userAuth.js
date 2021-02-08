@@ -142,16 +142,29 @@ export const UserAuth = () => {
         resolved(null);
       } else {
         let user_param = getUserParam(user);
-        const snapshot = db.ref("/users/" + user.uid).once("value");
-        if (snapshot.val()) {
-          user_param = Object.assign(user_param, {
-            username: snapshot.val().username,
-            roll: snapshot.val().roll,
+        db.ref("/users/" + user.uid)
+          .once("value")
+          .then((snapshot) => {
+            user_param = Object.assign(user_param, {
+              username: snapshot.val().username,
+              roll: snapshot.val().roll,
+            });
+            resolved(user_param);
+          })
+          .catch((error) => {
+            console.error(error);
+            resolved(null);
           });
-          resolved(user_param);
-        } else {
-          resolved(null);
-        }
+        // const snapshot = db.ref("/users/" + user.uid).once("value");
+        // if (snapshot.val()) {
+        //   user_param = Object.assign(user_param, {
+        //     username: snapshot.val().username,
+        //     roll: snapshot.val().roll,
+        //   });
+        //   resolved(user_param);
+        // } else {
+        //   resolved(null);
+        // }
       }
     });
   };

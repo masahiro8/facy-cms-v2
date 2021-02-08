@@ -3,9 +3,7 @@
     <GlobalHeader />
     <Profile />
     <v-main>
-      <v-container fluid>
-        <router-view />
-      </v-container>
+      <router-view />
     </v-main>
   </v-app>
 </template>

@@ -14,7 +14,10 @@ import VeeValidate, { Validator } from "vee-validate";
 // 日本語ファイルを読み込み
 import ja from "vee-validate/dist/locale/ja";
 
-initFirebase();
+
+// for firebase
+import { initFirebase } from "@/api/api";
+
 
 Vue.use(Vuetify);
 Vue.use(VeeValidate);
@@ -28,8 +31,12 @@ const opts = {
 Validator.localize("ja", ja);
 Vue.use(VeeValidate, { locale: ja });
 
+// firebase
+initFirebase();
+
 Vue.config.productionTip = false;
 
+// condesandbox
 /* eslint-disable no-new */
 new Vue({
   router,
@@ -38,3 +45,11 @@ new Vue({
   components: { App },
   template: "<App/>"
 });
+
+// localhost
+// new Vue({
+//   render: h => h(App),
+//   router,
+//   components: { App },
+//   vuetify: new Vuetify(opts),
+// }).$mount('#app')
