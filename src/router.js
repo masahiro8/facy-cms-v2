@@ -4,6 +4,7 @@ import Home from "./views/Home.vue";
 import Login from "./components/Login.vue";
 import ResetPassword from "./components/ResetPassword.vue";
 import Schedule from "./views/Schedule.vue";
+import Reservation from "./views/Reservation.vue";
 import ManageTable from "./views/ManageTable.vue";
 import UpdateProfile from "./components/UpdateProfile";
 
@@ -27,6 +28,11 @@ export default new Router({
       path: "/schedule",
       name: "schedule",
       component: Schedule
+    },
+    {
+      path: "/reservation",
+      name: "reservation",
+      component: Reservation
     },
     {
       path: "/managetable",

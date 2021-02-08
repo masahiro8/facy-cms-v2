@@ -18,7 +18,10 @@
     "vee-validate": "2.2.10",
     "vue": "^2.6.11",
     "vue-router": "3.4.9",
-    "vuetify": "2.4.2"
+    "vuetify": "2.4.2",
+    "scss": "^0.2.4",
+    "scss-loader": "^0.0.1",
+    "vue-selector": "0.0.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-eslint": "4.1.1",

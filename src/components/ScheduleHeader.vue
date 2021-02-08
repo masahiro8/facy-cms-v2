@@ -1,5 +1,5 @@
 <template>
-  <v-row class="scheule-header">
+  <v-row class="scheule-header px-4">
     <v-col cols="3">
       <v-select
         v-model="sortKey"
@@ -70,6 +70,7 @@
   </v-row>
 </template>
 <script>
+import * as _ from "lodash";
 export default {
   data: () => {
     return {
@@ -95,7 +96,7 @@ export default {
   computed: {
     dateRangeText() {
       if (this.dates) {
-        return this.dates.join(" 〜 ");
+        return _.sortBy(this.dates).join(" 〜 ");
       }
       return null;
     },

@@ -31,8 +31,12 @@ initFirebase();
 Validator.localize("ja", ja);
 Vue.use(VeeValidate, { locale: ja });
 
+// firebase
+initFirebase();
+
 Vue.config.productionTip = false;
 
+// condesandbox
 /* eslint-disable no-new */
 new Vue({
   router,
@@ -41,3 +45,11 @@ new Vue({
   components: { App },
   template: "<App/>"
 });
+
+// localhost
+// new Vue({
+//   render: h => h(App),
+//   router,
+//   components: { App },
+//   vuetify: new Vuetify(opts),
+// }).$mount('#app')

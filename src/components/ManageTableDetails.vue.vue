@@ -5,7 +5,7 @@
       <div class="manage-table__title">
         <v-checkbox
           v-model="dayData.active"
-          :label="`${func.getJpDay(dayName)}`"
+          :label="`${funcManageTable.getJpDay(dayName)}`"
         ></v-checkbox>
       </div>
       <div class="manage-table__header">
@@ -19,6 +19,7 @@
             <v-select
               :items="selectTimeRange"
               v-model="dayData.start_time"
+              @change="onTimeChange"
               filled
               dense
             ></v-select>
@@ -27,6 +28,7 @@
             <v-select
               :items="selectTimeRange"
               v-model="dayData.end_time"
+              @change="onTimeChange"
               filled
               dense
             ></v-select>
@@ -36,6 +38,7 @@
               :items="selectTimeDuration"
               item-text="`${dayData.time}分`"
               v-model="dayData.time"
+              @change="onTimeChange"
               filled
               dense
             >
@@ -50,19 +53,24 @@
     <v-divider></v-divider>
     <!-- {{ dayData.detail }} -->
     <div class="manage-table-inner">
-      <span v-for="time in dayData.detail" :key="time.timeid">
-        <v-checkbox
-          v-model="time.active"
-          :label="`${time.start} - ${time.end}`"
-        ></v-checkbox>
-      </span>
+      <div class="manage-table__header">
+        <div class="header__detail">個別の時間指定</div>
+      </div>
+      <div class="manage-table__content">
+        <span v-for="time in dayData.detail" :key="time.timeid">
+          <v-checkbox
+            v-model="time.active"
+            :label="`${time.start} - ${time.end}`"
+          ></v-checkbox>
+        </span>
+      </div>
     </div>
   </div>
 </template>
 <script>
-import * as _ from "lodash";
+// import * as _ from "lodash";
 // import CONFIG_SCHEDULE from "../../public/json/config_schedule.json";
-import func from "../func.js";
+import funcManageTable from "../funcManageTable.js";
 import { START_END_TIME_RANGE, DURATIONS } from "../const.js";
 
 // import manageTimetableHeader from "../components/manageTimetableHeader.vue";
@@ -75,41 +83,19 @@ export default {
   props: { dayName: String, dayDataProp: Object },
   data: function () {
     return {
-      func: func,
-      dayData: this.dayDataProp,
-      // weekData: CONFIG_SCHEDULE.day_of_week,
+      funcManageTable: funcManageTable,
+      dayData: {},
       selectTimeRange: START_END_TIME_RANGE, // 開始、終了時刻選択option
       selectTimeDuration: DURATIONS, // 時間枠の長さoption
     };
   },
+  mounted() {
+    this.dayData = this.dayDataProp;
+  },
   methods: {
-    convertToInt(_time) {
-      return _time ? +_time.replace(":00", "") : "";
-    },
-    // 開始時間から終了時間を計算
-    getEndTime(_startTime) {
-      const match = _startTime.match(/(\d{1,2}):(\d{2})/);
-      const hour = +match[1];
-      const minute = +match[2];
-      const calcMinute = minute + +this.dayData.time;
-      if (calcMinute >= 60) {
-        return `${hour + 1}:00`;
-      } else {
-        return `${hour}:${calcMinute}`;
-      }
-    },
-    // 枠時間の長さ変更後の時間枠list
-    resetEditTimTable() {
-      const arr = this.detailStartTimes.map((_time, index) => {
-        return {
-          timeid: index + 1,
-          start: _time,
-          end: this.getEndTime(_time),
-          active: true,
-        };
-      });
-      console.log("detailTimetable", arr);
-      this.dayData.detail = arr;
+    onTimeChange() {
+      // 時間系の変更あれば時間枠を再生成
+      this.dayData.detail = this.funcManageTable.rebuildTimeTable(this.dayData);
     },
   },
   watch: {
@@ -119,50 +105,6 @@ export default {
       handler: function (newVal) {
         this.dayData = newVal;
       },
-    },
-  },
-  created() {
-    // 時間系の変更あれば時間枠をreset
-    this.$watch(
-      () => [this.startTime, this.endTime, this.duration],
-      (newValue, oldValue) => {
-        if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
-          this.resetEditTimTable();
-        }
-      }
-    );
-  },
-  computed: {
-    startTime() {
-      return this.dayData.start_time;
-    },
-    endTime() {
-      return this.dayData.end_time;
-    },
-    duration() {
-      return this.dayData.time;
-    },
-    // 選択中のstart-end時間list
-    detailTimeRange() {
-      const start = this.convertToInt(this.dayData.start_time);
-      const end = this.convertToInt(this.dayData.end_time);
-      return _.map(_.range(start, end), function (_time) {
-        return _time + ":00";
-      });
-    },
-    // 一枠の長さで分割した枠の開始時間list
-    detailStartTimes() {
-      const duration = this.dayData.time;
-      const ratio = parseInt(60 / +duration, 0);
-      let _d = [];
-      this.detailTimeRange.forEach((_time) => {
-        const timesToAdd = _.map(_.range(1, ratio), function (i) {
-          return _time.replace("00", duration * i);
-        });
-        _d.push(_time);
-        _d.push(...timesToAdd);
-      });
-      return _d;
     },
   },
 };
