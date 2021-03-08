@@ -46,7 +46,7 @@ export default {
     drawer: false,
     items: [
       { path: "/login", title: "ログイン画面" },
-      { path: "/manage/reset", title: "パスワードリセット画面" },
+      { path: "/reset", title: "パスワードリセット画面" },
       { path: "/manage/schedule", title: "スケジュール画面" },
       { path: "/manage/managetable", title: "予約可能日設定" },
       { path: "/reservation", title: "予約フォーム" },

@@ -14,20 +14,20 @@ Vue.use(Router);
 // manage/* ルートガード
 // mahouLoginAt から24時間経過したらログアウト
 // mahouKeepLogin == 1 の場合、24時間を超えてもログアウトしない
-function guardManageRoutes(to, from, next){
+function guardManageRoutes(to, from, next) {
   let isAuthenticated = false;
   const loginStatus = localStorage.getItem("mahouKeepLogin"); // 1 or undef
   const loginAt = localStorage.getItem("mahouLoginAt") // 時間 or undef
   const nowMinus24Hrs = new Date().getTime() - 60 * 60 * 24 * 1000
-  if ( (loginStatus == 1) || (loginAt > nowMinus24Hrs) ) {
+  if ((loginStatus == 1) || (loginAt > nowMinus24Hrs)) {
     isAuthenticated = true;
   } else {
-    isAuthenticated= false;
+    isAuthenticated = false;
   }
   if (isAuthenticated) {
     next(); // そのまま進む
   } else {
-    next('/' ); // リダイレクト
+    next('/login'); // リダイレクト
   }
 }
 
@@ -51,34 +51,33 @@ export default new Router({
       name: "login",
       component: Login,
     },
-    { 
-      path: "/manage/reset",
+    {
+      path: "/reset",
       name: "reset",
-      beforeEnter : guardManageRoutes,
       component: ResetPassword
     },
     {
       path: "/manage/schedule",
       name: "schedule",
-      beforeEnter : guardManageRoutes,
+      beforeEnter: guardManageRoutes,
       component: Schedule,
     },
     {
       path: "/manage/managetable",
       name: "ManageTable",
-      beforeEnter : guardManageRoutes,
+      beforeEnter: guardManageRoutes,
       component: ManageTable,
     },
     {
       path: "/manage/manageaccount",
       name: "ManageAcount",
-      beforeEnter : guardManageRoutes,
+      beforeEnter: guardManageRoutes,
       component: ManageAccount,
     },
     {
       path: "/manage/updateprofile",
       name: "UpdateProfile",
-      beforeEnter : guardManageRoutes,
+      beforeEnter: guardManageRoutes,
       component: UpdateProfile,
       props: true,
     },
