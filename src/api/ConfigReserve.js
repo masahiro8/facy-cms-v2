@@ -236,8 +236,13 @@ export const ConfigReserve = () => {
 
   //曜日単位で更新
   const updateDayOfWeek = async (params) => {
+    return get().then((result) => {
+      return setDayOfWeek(params, result)
+    })
+  };
+
+  const setDayOfWeek = async (params, reserves) => {
     return new Promise((resolved) => {
-      const reserves = get();
       const day_of_week = Object.assign(reserves.day_of_week, params);
       db.ref("/config_reserves/day_of_week").set(day_of_week, (error) => {
         if (error) {
@@ -265,16 +270,26 @@ export const ConfigReserve = () => {
       return reqKey(dateconfig[key], datearray, path, value);
     } else {
       //ここから値を再帰的に作成
-      const _key = datearray.pop();
-      const param = getKeyParam(datearray, { [_key]: value });
-      return { path, param: { [key]: param } };
+      datearray.pop();
+      const param = getKeyParam(datearray, value);
+      if (!key) {
+        // 日付keyがない場合
+        return { path, param }
+      } else {
+        return { path, param: { [key]: param } };       
+      }
     }
   };
 
   const setDate = async ({ year, month, day, params }) => {
+    return get().then((reserves) => {
+      return setOneDate({ year, month, day, params, reserves })
+    })
+  };
+
+  const setOneDate = async ({ year, month, day, params, reserves }) => {
     console.log("params = ", params);
     return new Promise((resolved) => {
-      const reserves = get();
       //再帰的に登録できるキーを抽出
       const { path, param } = reqKey(
         { ...reserves.date },
