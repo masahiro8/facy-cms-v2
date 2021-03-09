@@ -49,6 +49,7 @@ export default {
       { path: "/reset", title: "パスワードリセット画面" },
       { path: "/manage/schedule", title: "スケジュール画面" },
       { path: "/manage/managetable", title: "予約可能日設定" },
+      { path: "/manage/types", title: "時間枠管理" },
       { path: "/reservation", title: "予約フォーム" },
     ],
   }),

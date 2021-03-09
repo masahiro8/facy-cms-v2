@@ -6,6 +6,7 @@
       <v-btn class="mr-4 mt-4" to="/reset">パスワードリセット画面</v-btn>
       <v-btn class="mr-4 mt-4" to="/manage/schedule">スケジュール画面</v-btn>
       <v-btn class="mr-4 mt-4" to="/manage/managetable">予約可能日設定</v-btn>
+      <v-btn class="mr-4 mt-4" to="/manage/types">枠一覧画面</v-btn>
       <v-btn class="mr-4 mt-4" to="/reservation">予約フォーム</v-btn>
     </v-row>
   </v-container>

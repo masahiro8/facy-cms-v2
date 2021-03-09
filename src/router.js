@@ -8,6 +8,7 @@ import Reservation from "./views/Reservation.vue";
 import ManageTable from "./views/ManageTable.vue";
 import ManageAccount from "./components/ManageAccount.vue";
 import UpdateProfile from "./components/UpdateProfile.vue";
+import ManageTypeIds from "./views/ManageTypeIds.vue";
 
 Vue.use(Router);
 
@@ -79,6 +80,13 @@ export default new Router({
       name: "UpdateProfile",
       beforeEnter: guardManageRoutes,
       component: UpdateProfile,
+      props: true,
+    },
+    {
+      path: "/manage/types",
+      name: "ManageTypeIds",
+      beforeEnter: guardManageRoutes,
+      component: ManageTypeIds,
       props: true,
     },
   ],
