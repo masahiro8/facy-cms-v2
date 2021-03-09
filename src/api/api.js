@@ -4,6 +4,7 @@ import { Users } from "./users";
 import { Reserves } from "./reserve";
 import { ConfigReserve } from "./ConfigReserve";
 import { DAY_OF_WEEK } from "./statics";
+import { Typeids } from "./typeids";
 
 function initFirebase() {
   const firebaseConfig = {
@@ -18,4 +19,4 @@ function initFirebase() {
   firebase.initializeApp(firebaseConfig);
 }
 
-export { initFirebase, UserAuth, Users, Reserves, ConfigReserve, DAY_OF_WEEK };
+export { initFirebase, UserAuth, Users, Reserves, ConfigReserve, DAY_OF_WEEK, Typeids };
