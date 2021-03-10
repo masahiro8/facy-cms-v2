@@ -17,7 +17,7 @@
           </thead>
           <tbody>
             <tr v-for="(type, index) in typeIds" :key="type.id">
-              <td>{{ type.name }} {{ type.id }}</td>
+              <td>{{ type.name }}</td>
               <td>{{ type.description }}</td>
               <td class="text-right">
                 <v-icon
@@ -77,6 +77,13 @@ export default {
   methods: {
     async getTypeids() {
       this.typeIds = await Typeids().get();
+      this.typeIds.sort((a, b) => {
+        if (a.name < b.name) {
+          return -1;
+        } else {
+          return 1;
+        }
+      });
     },
     async removeTypeId(id) {
       if (window.confirm("削除してもよろしいですか？")) {
