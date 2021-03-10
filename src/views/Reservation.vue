@@ -60,6 +60,18 @@
           :items="timeRangeOptions"
           item-text="range"
           item-value="timeid"
+          label="時間帯"
+          return-object
+        ></v-select>
+
+        <v-select
+          class="mt-4"
+          v-model="typeId"
+          :rules="typeIdRules"
+          :items="typeIds"
+          item-text="name"
+          item-value="id"
+          label="時間枠"
           return-object
         ></v-select>
 
@@ -107,9 +119,21 @@
               item-text="range"
               item-value="timeid"
               return-object
+              label="時間帯"
               disabled
-            ></v-select
-          ></v-card-text>
+            ></v-select>
+
+            <v-select
+              class="mt-4"
+              v-model="typeId"
+              :items="typeIds"
+              item-text="name"
+              item-value="id"
+              label="時間枠"
+              return-object
+              disabled
+            ></v-select>
+          </v-card-text>
 
           <!-- TODO: 確認画面はコンポーネント分けた方が良いかも -->
           <v-card-actions>
@@ -157,7 +181,7 @@
 </template>
 <script>
 import * as _ from "lodash";
-import { ConfigReserve, Reserves } from "@/api/api";
+import { ConfigReserve, Reserves, Typeids } from "@/api/api";
 
 export default {
   data: () => ({
@@ -178,7 +202,21 @@ export default {
     timeRules: [(v) => !!v || "時間帯を選択してください"],
     message: false,
     notReservable: false,
+    typeId: null,
+    typeIdRules: [(v) => !!v || "時間枠を選択してください"],
+    typeIds: [],
   }),
+  async mounted() {
+    // 枠データ取得
+    this.typeIds = await Typeids().get();
+    this.typeIds.sort((a, b) => {
+      if (a.name < b.name) {
+        return -1;
+      } else {
+        return 1;
+      }
+    });
+  },
   computed: {
     dateText() {
       if (this.date) {
@@ -265,6 +303,7 @@ export default {
         reserve_date: this.date,
         start_time: this.timeRange.start,
         end_time: this.timeRange.end,
+        type_id: this.typeId.id,
       };
       const result = await Reserves().setNewReserve(params);
       console.log("result", result);
