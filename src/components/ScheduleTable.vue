@@ -6,6 +6,7 @@
         <div class="header__date">日付</div>
         <div class="header__start-time">開始</div>
         <div class="header__end-time">終了</div>
+        <div class="header__type-id">時間枠</div>
         <div class="header__user-mail">メールアドレス</div>
         <div class="header__video-user-id">サポートid</div>
         <div class="header__video-cms-id">カスタマーid</div>
@@ -28,6 +29,9 @@
             {{ reservation.start_time }}
           </div>
           <div class="reservation__end-time">{{ reservation.end_time }}</div>
+          <div class="reservation__type-id">
+            {{ getTypeIdName(reservation.type_id) }}
+          </div>
           <div class="reservation__user-mail">{{ reservation.user_mail }}</div>
           <div class="reservation__video-user-id">
             {{ reservation.video_user_id }}
@@ -55,6 +59,7 @@
 import { mdiMessageVideo } from "@mdi/js";
 import { mdiPencil } from "@mdi/js";
 import ScheduleEdit from "./ScheduleEdit.vue";
+import { Typeids } from "@/api/api";
 
 export default {
   props: { reservations: Array },
@@ -65,10 +70,15 @@ export default {
       editorOpen: false,
       reservation: null,
       id: null,
+      typeIds: [],
     };
   },
   components: {
     ScheduleEdit,
+  },
+  async mounted() {
+    // 枠データ取得
+    this.typeIds = await Typeids().get();
   },
   methods: {
     edit(id) {
@@ -79,6 +89,11 @@ export default {
     update() {
       this.$emit("update");
     },
+    getTypeIdName(id) {
+      // 時間枠の名前
+      const found = this.typeIds.find((elm) => elm.id == id);
+      return found ? found.name : "-";
+    },
   },
   computed: {},
 };
@@ -87,9 +102,10 @@ export default {
 <style lang="scss" scoped>
 $table-width: 1024px;
 $chat-width: 54px;
-$date-width: 160px;
-$start-time-width: 76px;
-$end-time-width: 76px;
+$date-width: 128px;
+$start-time-width: 64px;
+$end-time-width: 64px;
+$type-id-width: 146px;
 $user-mail-width: 200px;
 $video-user-id-width: 200px;
 $video-cms-id-width: 200px;
@@ -126,6 +142,10 @@ $edit-width: 54px;
   .header__end-time {
     padding: 8px;
     width: $end-time-width;
+  }
+  .header__type-id {
+    padding: 8px;
+    width: $type-id-width;
   }
   .header__user-mail {
     padding: 8px;
@@ -167,6 +187,10 @@ $edit-width: 54px;
   .reservation__end-time {
     padding: 8px;
     width: $end-time-width;
+  }
+  .reservation__type-id {
+    padding: 8px;
+    width: $type-id-width;
   }
   .reservation__user-mail {
     padding: 8px;
