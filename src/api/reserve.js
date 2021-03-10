@@ -54,8 +54,12 @@ export const Reserves = () => {
       } else {
         ref = db.ref("/reserves");
       }
+
       ref.on("value", (snapshot) => {
-        const _reserves = snapshot.val();
+        const _reserves = snapshot.val()
+
+        if (_reserves == null) { return resolved([]) } //予約なし時
+
         const reserves = Object.keys(_reserves)
           .filter((key) => {
             return (
