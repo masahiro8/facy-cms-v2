@@ -92,6 +92,21 @@
 
       <v-list-item>
         <v-list-item-content>
+          <v-list-item-title>時間枠</v-list-item-title>
+          <v-select
+            v-model="typeId"
+            :items="typeIds"
+            item-text="name"
+            item-value="id"
+            filled
+            dense
+            return-object
+          ></v-select>
+        </v-list-item-content>
+      </v-list-item>
+
+      <v-list-item>
+        <v-list-item-content>
           <v-list-item-title>サポートid</v-list-item-title>
           <v-list-item-subtitle>{{
             reservation.video_user_id
@@ -113,7 +128,7 @@
 <script>
 import * as _ from "lodash";
 import { mdiClose } from "@mdi/js";
-import { ConfigReserve, Reserves } from "@/api/api";
+import { ConfigReserve, Reserves, Typeids } from "@/api/api";
 
 export default {
   data: () => ({
@@ -127,6 +142,8 @@ export default {
     timeId: "",
     timeRange: "",
     timeRangeOptions: [],
+    typeId: null,
+    typeIds: [],
   }),
   props: {
     editorOpen: { type: Boolean, default: false },
@@ -157,6 +174,10 @@ export default {
       this.email = this.reservation.user_mail;
       this.date = this.reservation.date;
       this.getTimeRangeOptions(this.date);
+      this.typeId = this.reservation.type_id;
+
+      // 時間枠リスト取得
+      this.getTypeIds();
     },
     date() {
       //日付に変更があったら時間帯のオプションを再取得
@@ -243,6 +264,7 @@ export default {
         reserve_date: this.date,
         start_time: this.timeRange.start,
         end_time: this.timeRange.end,
+        type_id: this.typeId.id,
       };
 
       const result = await Reserves().updateReserve(params);
@@ -263,6 +285,16 @@ export default {
         start: detail.start_time,
         range: "",
       };
+    },
+    async getTypeIds() {
+      this.typeIds = await Typeids().get();
+      this.typeIds.sort((a, b) => {
+        if (a.name < b.name) {
+          return -1;
+        } else {
+          return 1;
+        }
+      });
     },
   },
 };
