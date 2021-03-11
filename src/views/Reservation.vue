@@ -182,6 +182,7 @@
 <script>
 import * as _ from "lodash";
 import { ConfigReserve, Reserves, Typeids } from "@/api/api";
+import funcManageTable from "../funcManageTable.js";
 
 export default {
   data: () => ({
@@ -205,17 +206,12 @@ export default {
     typeId: null,
     typeIdRules: [(v) => !!v || "時間枠を選択してください"],
     typeIds: [],
+    funcManageTable: funcManageTable,
   }),
   async mounted() {
-    // 枠データ取得
-    this.typeIds = await Typeids().get();
-    this.typeIds.sort((a, b) => {
-      if (a.name < b.name) {
-        return -1;
-      } else {
-        return 1;
-      }
-    });
+    // 枠データ取得、nameでsortしてset
+    const _typeIds = await Typeids().get();
+    this.typeIds = this.funcManageTable.sortTypesByName(_typeIds);
   },
   computed: {
     dateText() {

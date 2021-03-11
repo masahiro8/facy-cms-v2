@@ -83,8 +83,20 @@ const funcManageTable = {
     });
     // console.log("rebuildTimeTable", arr);
     return arr;
+  },
+
+  // 時間枠のobject配列をnameでsort
+  sortTypesByName(typeIds) {
+    typeIds.sort((a, b) => {
+      if (a.name < b.name) {
+        return -1;
+      } else {
+        return 1;
+      }
+    });
+    return typeIds
   }
-  
+
 };
 
 export default funcManageTable;

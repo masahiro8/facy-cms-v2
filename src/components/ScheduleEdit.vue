@@ -129,6 +129,7 @@
 import * as _ from "lodash";
 import { mdiClose } from "@mdi/js";
 import { ConfigReserve, Reserves, Typeids } from "@/api/api";
+import funcManageTable from "../funcManageTable.js";
 
 export default {
   data: () => ({
@@ -144,6 +145,7 @@ export default {
     timeRangeOptions: [],
     typeId: null,
     typeIds: [],
+    funcManageTable: funcManageTable,
   }),
   props: {
     editorOpen: { type: Boolean, default: false },
@@ -287,14 +289,9 @@ export default {
       };
     },
     async getTypeIds() {
-      this.typeIds = await Typeids().get();
-      this.typeIds.sort((a, b) => {
-        if (a.name < b.name) {
-          return -1;
-        } else {
-          return 1;
-        }
-      });
+      // 枠データ取得、nameでsortしてset
+      const _typeIds = await Typeids().get();
+      this.typeIds = this.funcManageTable.sortTypesByName(_typeIds);
     },
   },
 };

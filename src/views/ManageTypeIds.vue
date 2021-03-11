@@ -55,6 +55,7 @@ import { mdiDelete } from "@mdi/js";
 import Drawer from "../components/Drawer.vue";
 import ManageTypeIdDetail from "../components/ManageTypeIdDetail.vue";
 import { Typeids } from "../api/api";
+import funcManageTable from "../funcManageTable.js";
 
 export default {
   name: "managetypeids",
@@ -68,6 +69,7 @@ export default {
       removeIcon: mdiDelete,
       drawerToggle: false,
       editId: {},
+      funcManageTable: funcManageTable,
     };
   },
   mounted() {
@@ -76,14 +78,9 @@ export default {
   },
   methods: {
     async getTypeids() {
-      this.typeIds = await Typeids().get();
-      this.typeIds.sort((a, b) => {
-        if (a.name < b.name) {
-          return -1;
-        } else {
-          return 1;
-        }
-      });
+      // 枠データ取得、nameでsortしてset
+      const _typeIds = await Typeids().get();
+      this.typeIds = this.funcManageTable.sortTypesByName(_typeIds);
     },
     async removeTypeId(id) {
       if (window.confirm("削除してもよろしいですか？")) {
