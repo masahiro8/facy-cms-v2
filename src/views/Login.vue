@@ -60,7 +60,7 @@ export default {
   }),
   mounted() {
     const _loginStatus = localStorage.getItem("mahouKeepLogin"); // 1 or undef
-    this.loginStatus = _loginStatus == 1 ? true : false;
+    this.loginStatus = _loginStatus === 1 ? true : false;
   },
   methods: {
     async login() {
