@@ -13,7 +13,7 @@
         @change="$emit('sort-key', sortKey)"
       ></v-select>
     </v-col>
-    <v-col cols="3">
+    <v-col cols="2">
       <v-select
         v-model="sortOrder"
         :items="sortOrderOptions"
@@ -24,6 +24,21 @@
         dense
         return-object
         @change="$emit('sort-order', sortOrder)"
+      >
+      </v-select>
+    </v-col>
+
+    <v-col cols="2">
+      <v-select
+        v-model="typeIdsSelect"
+        :items="typeIds"
+        item-text="name"
+        item-value="id"
+        label="時間枠で絞り込み"
+        filled
+        dense
+        multiple
+        @change="$emit('set-filter-keys', typeIdsSelect)"
       >
       </v-select>
     </v-col>
@@ -71,6 +86,8 @@
 </template>
 <script>
 import * as _ from "lodash";
+import { Typeids } from "@/api/api";
+
 export default {
   data: () => {
     return {
@@ -91,7 +108,20 @@ export default {
         { label: "昇順", value: "asc" },
         { label: "降順", value: "desc" },
       ],
+      typeIdsSelect: [],
+      typeIds: [],
     };
+  },
+  async mounted() {
+    // 枠データ取得
+    this.typeIds = await Typeids().get();
+    this.typeIds.sort((a, b) => {
+      if (a.name < b.name) {
+        return -1;
+      } else {
+        return 1;
+      }
+    });
   },
   computed: {
     dateRangeText() {

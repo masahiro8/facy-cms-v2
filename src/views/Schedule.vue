@@ -4,6 +4,7 @@
       @date-range="changeDateRange"
       @sort-key="changeSortKey"
       @sort-order="changeSortOrder"
+      @set-filter-keys="setFilterKeys"
     />
     <v-divider></v-divider>
     <ScheduleTable :reservations="sorted" @edit="edit" @update="update" />
@@ -26,6 +27,7 @@ export default {
       dateRange: null,
       sortKey: null,
       sortOrder: "asc",
+      filterKeys: [],
     };
   },
   async mounted() {
@@ -59,13 +61,28 @@ export default {
     update() {
       this.getReservationData();
     },
+    setFilterKeys(value) {
+      this.filterKeys = value;
+    },
   },
   computed: {
+    filteredByType() {
+      // reserveDataをtype_idでフィルター
+      if (this.filterKeys.length > 0) {
+        return this.filterKeys.reduce((_arr, key) => {
+          return _arr.concat(
+            this.reserveData.filter((reserve) => reserve.type_id === key)
+          );
+        }, []); // ← reduceの初期値をarrayにする
+      } else {
+        return this.reserveData;
+      }
+    },
     limited() {
       if (this.dateRange && this.dateRange.length === 1) {
         //絞り込み期間の日付が一つしか指定がない場合
         //日付が一致するものだけ絞り込む
-        const filtered = _.filter(this.reserveData, [
+        const filtered = _.filter(this.filteredByType, [
           "date",
           this.dateRange[0],
         ]);
@@ -74,12 +91,12 @@ export default {
         //絞り込み期間の日付に開始日と終了日がある場合
         const start = this.dateRange[0];
         const end = this.dateRange[1];
-        const filtered = _.filter(this.reserveData, function (o) {
+        const filtered = _.filter(this.filteredByType, function (o) {
           return o.date >= start && o.date <= end;
         });
         return filtered;
       }
-      return this.reserveData;
+      return this.filteredByType;
     },
     sorted() {
       if (this.sortKey && this.sortOrder) {
