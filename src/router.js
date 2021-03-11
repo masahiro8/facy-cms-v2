@@ -18,9 +18,9 @@ Vue.use(Router);
 function guardManageRoutes(to, from, next) {
   let isAuthenticated = false;
   const loginStatus = localStorage.getItem("mahouKeepLogin"); // 1 or undef
-  const loginAt = localStorage.getItem("mahouLoginAt") // 時間 or undef
-  const nowMinus24Hrs = new Date().getTime() - 60 * 60 * 24 * 1000
-  if ((loginStatus == 1) || (loginAt > nowMinus24Hrs)) {
+  const loginAt = localStorage.getItem("mahouLoginAt"); // 時間 or undef
+  const nowMinus24Hrs = new Date().getTime() - 60 * 60 * 24 * 1000;
+  if (loginStatus == 1 || loginAt > nowMinus24Hrs) {
     isAuthenticated = true;
   } else {
     isAuthenticated = false;
@@ -39,18 +39,18 @@ export default new Router({
     {
       path: "/",
       name: "home",
-      component: Home,
+      component: Home
     },
     {
       path: "/reservation",
       name: "reservation",
-      component: Reservation,
+      component: Reservation
     },
     //ここからcms
     {
       path: "/login",
       name: "login",
-      component: Login,
+      component: Login
     },
     {
       path: "/reset",
@@ -61,19 +61,19 @@ export default new Router({
       path: "/manage/schedule",
       name: "schedule",
       beforeEnter: guardManageRoutes,
-      component: Schedule,
+      component: Schedule
     },
     {
       path: "/manage/managetable",
       name: "ManageTable",
       beforeEnter: guardManageRoutes,
-      component: ManageTable,
+      component: ManageTable
     },
     {
       path: "/manage/manageaccount",
       name: "ManageAcount",
       beforeEnter: guardManageRoutes,
-      component: ManageAccount,
+      component: ManageAccount
     },
     {
       path: "/manage/updateprofile",

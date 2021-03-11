@@ -25,8 +25,8 @@ export default {
     return {
       reserveData: null,
       dateRange: null,
-      sortKey: null,
-      sortOrder: "asc",
+      sortKey: "date",
+      sortOrder: "desc",
       filterKeys: [],
     };
   },
@@ -99,8 +99,17 @@ export default {
       return this.filteredByType;
     },
     sorted() {
-      if (this.sortKey && this.sortOrder) {
+      if (this.sortKey && this.sortKey === "end_time" && this.sortOrder) {
         const sorted = _.orderBy(this.limited, this.sortKey, this.sortOrder);
+
+        return sorted;
+      } else if (this.sortKey && this.sortOrder) {
+        const sorted = _.orderBy(
+          _.orderBy(this.limited, "start_time", "asc"), //開始時間（昇順）で並び替え
+          this.sortKey,
+          this.sortOrder
+        );
+
         return sorted;
       }
       return this.limited;

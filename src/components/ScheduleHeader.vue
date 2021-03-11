@@ -93,8 +93,8 @@ export default {
   data: () => {
     return {
       sortType: null,
-      sortKey: null,
-      sortOrder: "asc",
+      sortKey: { label: "日付", value: "date" },
+      sortOrder: { label: "降順", value: "desc" },
       menu: false,
       dates: null,
       sortKeyOptions: [
