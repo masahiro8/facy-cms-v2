@@ -8,6 +8,7 @@ import Reservation from "./views/Reservation.vue";
 import ManageTable from "./views/ManageTable.vue";
 import ManageAccount from "./components/ManageAccount.vue";
 import UpdateProfile from "./components/UpdateProfile.vue";
+import ManageTypeIds from "./views/ManageTypeIds.vue";
 
 Vue.use(Router);
 
@@ -27,7 +28,7 @@ function guardManageRoutes(to, from, next) {
   if (isAuthenticated) {
     next(); // そのまま進む
   } else {
-    next("/"); // リダイレクト
+    next('/login'); // リダイレクト
   }
 }
 
@@ -52,9 +53,8 @@ export default new Router({
       component: Login
     },
     {
-      path: "/manage/reset",
+      path: "/reset",
       name: "reset",
-      beforeEnter: guardManageRoutes,
       component: ResetPassword
     },
     {
@@ -80,7 +80,14 @@ export default new Router({
       name: "UpdateProfile",
       beforeEnter: guardManageRoutes,
       component: UpdateProfile,
-      props: true
-    }
-  ]
+      props: true,
+    },
+    {
+      path: "/manage/types",
+      name: "ManageTypeIds",
+      beforeEnter: guardManageRoutes,
+      component: ManageTypeIds,
+      props: true,
+    },
+  ],
 });
