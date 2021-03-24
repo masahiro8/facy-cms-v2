@@ -2,6 +2,7 @@ import firebase from "firebase";
 import { encrypt } from "./util/Encrypt.js";
 import { ConfigReserve } from "./ConfigReserve.js";
 import { DAY_OF_WEEK } from "./statics.js";
+import { Typeids } from "./api.js";
 
 /*
 {
@@ -142,37 +143,59 @@ export const Reserves = () => {
       });
     };
 
+    // 時間枠idを取得
+    const _typeids = await Typeids().get();
+    const typeidsIds = _typeids.map(type => {
+      return type.id
+    });
+
     //予約状況を取得
-    const currentReserve = await getReserves({
+    const _reserves = await getReserves({
       year,
       month,
       day,
     });
 
-    //日付から取得
-    const free_time_frame_date = await getFreeTimeFrameFromConfigDate({
-      year,
-      month,
-      day,
-      currentReserve,
-    });
+    const getFreeTimeFrameByTypeid = async (typeid) => {
+      // 予約データをtype_idでfilter
+      const currentReserve = _reserves.filter(reserve => {
+        return reserve.type_id == typeid
+      })
 
-    //曜日設定から取得
-    const free_time_frame_day = await getFreeTimeFrameFromConfigDayOfWeek({
-      year,
-      month,
-      day,
-      currentReserve,
-    });
-
-    let free_time_frame = free_time_frame_date || free_time_frame_day;
-
-    return new Promise((resolved) => {
-      resolved({
-        active: free_time_frame ? true : false,
-        detail: free_time_frame,
+      //日付から取得
+      const free_time_frame_date = await getFreeTimeFrameFromConfigDate({
+        year,
+        month,
+        day,
+        currentReserve,
       });
+
+      //曜日設定から取得
+      const free_time_frame_day = await getFreeTimeFrameFromConfigDayOfWeek({
+        year,
+        month,
+        day,
+        currentReserve,
+      });
+
+      let free_time_frame = free_time_frame_date || free_time_frame_day;
+
+      return new Promise((resolved) => {
+        resolved({
+          active: free_time_frame ? true : false,
+          detail: free_time_frame,
+        });
+      });
+    }
+
+    // 時間枠ごとに予約可能時間帯を取得
+    let free_time_frames_by_typeid = {}
+    typeidsIds.forEach(typeid => {
+      free_time_frames_by_typeid[typeid] = getFreeTimeFrameByTypeid(typeid);
     });
+
+    console.log("free_time_frames_by_typeid", free_time_frames_by_typeid)
+    return free_time_frames_by_typeid;
   };
 
   /**
