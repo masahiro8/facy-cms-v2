@@ -194,7 +194,7 @@ export const Reserves = () => {
       free_time_frames_by_typeid[typeid] = getFreeTimeFrameByTypeid(typeid);
     });
 
-    console.log("free_time_frames_by_typeid", free_time_frames_by_typeid)
+    // console.log("free_time_frames_by_typeid", free_time_frames_by_typeid)
     return free_time_frames_by_typeid;
   };
 
