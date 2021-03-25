@@ -83,6 +83,14 @@ export const Reserves = () => {
     });
   };
 
+
+  /**
+  * 予約可能な時間帯を枠ごとに返す
+  * 空きがない枠は返さない
+  * @param {string*null} year //"01"とか２桁の文字列
+  * @param {string*null} month //"01"とか２桁の文字列
+  * @param {string*null} day //"01"とか２桁の文字列
+  */
   const getReservableTime = async ({ year, month, day }) => {
     //曜日設定から取得
     const getFreeTimeFrameFromConfigDayOfWeek = async ({
@@ -180,6 +188,12 @@ export const Reserves = () => {
 
       let free_time_frame = free_time_frame_date || free_time_frame_day;
 
+      // 空き時間帯がない枠のデータを返さない
+      const free_time_frame_numbers = free_time_frame.filter(frame => {
+        return frame.active;
+      }).length;
+      if (free_time_frame_numbers < 1) { return false }
+
       return new Promise((resolved) => {
         resolved({
           active: free_time_frame ? true : false,
@@ -191,7 +205,11 @@ export const Reserves = () => {
     // 時間枠ごとに予約可能時間帯を取得
     let free_time_frames_by_typeid = {}
     typeidsIds.forEach(typeid => {
-      free_time_frames_by_typeid[typeid] = getFreeTimeFrameByTypeid(typeid);
+      getFreeTimeFrameByTypeid(typeid).then((result) => {
+        if (result) {
+          free_time_frames_by_typeid[typeid] = result
+        }
+      })
     });
 
     // console.log("free_time_frames_by_typeid", free_time_frames_by_typeid)
