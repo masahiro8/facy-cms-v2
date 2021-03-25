@@ -217,12 +217,6 @@ export default {
     const _typeids = await this.getTypeids();
     this.typeIds = _typeids;
     this.typeIdsReset = _typeids;
-
-    this.testA = await Reserves().getReservableTime({
-      year: "2021",
-      month: "3",
-      day: "4",
-    });
   },
   computed: {
     dateText() {
