@@ -55,23 +55,23 @@
 
         <v-select
           class="mt-4"
-          v-model="timeRange"
-          :rules="timeRules"
-          :items="timeRangeOptions"
-          item-text="range"
-          item-value="timeid"
-          label="時間帯"
-          return-object
-        ></v-select>
-
-        <v-select
-          class="mt-4"
           v-model="typeId"
           :rules="typeIdRules"
           :items="typeIds"
           item-text="name"
           item-value="id"
           label="時間枠"
+          return-object
+        ></v-select>
+
+        <v-select
+          class="mt-4"
+          v-model="timeRange"
+          :rules="timeRules"
+          :items="timeRangeOptions"
+          item-text="range"
+          item-value="timeid"
+          label="時間帯"
           return-object
         ></v-select>
 
@@ -114,23 +114,23 @@
 
             <v-select
               class="mt-4"
-              v-model="timeRange"
-              :items="timeRangeOptions"
-              item-text="range"
-              item-value="timeid"
-              return-object
-              label="時間帯"
-              disabled
-            ></v-select>
-
-            <v-select
-              class="mt-4"
               v-model="typeId"
               :items="typeIds"
               item-text="name"
               item-value="id"
               label="時間枠"
               return-object
+              disabled
+            ></v-select>
+
+            <v-select
+              class="mt-4"
+              v-model="timeRange"
+              :items="timeRangeOptions"
+              item-text="range"
+              item-value="timeid"
+              return-object
+              label="時間帯"
               disabled
             ></v-select>
           </v-card-text>
@@ -167,21 +167,21 @@
       </v-card>
     </v-dialog>
     <!-- 空き時間なしメッセージ -->
-    <v-dialog v-model="notReservable" persistent max-width="500">
+    <!-- <v-dialog v-model="notReservable" persistent max-width="500">
       <v-card class="pa-4">
         <v-card-title class="text-center"
-          >この日には予約可能な時間枠がありません</v-card-title
+          >この日には予約可能な時間枠がありませ</v-card-title
         >
         <v-card-actions>
           <v-btn block large text @click="notReservable = false"> 戻る </v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
+    </v-dialog> -->
   </v-sheet>
 </template>
+
 <script>
-import * as _ from "lodash";
-import { ConfigReserve, Reserves, Typeids } from "@/api/api";
+import { Reserves, Typeids } from "@/api/api";
 import funcManageTable from "../funcManageTable.js";
 
 export default {
@@ -202,16 +202,27 @@ export default {
     timeRangeOptions: [],
     timeRules: [(v) => !!v || "時間帯を選択してください"],
     message: false,
-    notReservable: false,
+    // notReservable: false,
     typeId: null,
     typeIdRules: [(v) => !!v || "時間枠を選択してください"],
-    typeIds: [],
+    typeIds: [], // 時間枠の選択肢
+    typeIdsReset: [], // apiからの初期値
     funcManageTable: funcManageTable,
+    timeRangeByDate: {},
+    typeIdsHasTimeReservable: {},
+    testA: {},
   }),
   async mounted() {
-    // 枠データ取得、nameでsortしてset
-    const _typeIds = await Typeids().get();
-    this.typeIds = this.funcManageTable.sortTypesByName(_typeIds);
+    // 枠データ取得
+    const _typeids = await this.getTypeids();
+    this.typeIds = _typeids;
+    this.typeIdsReset = _typeids;
+
+    this.testA = await Reserves().getReservableTime({
+      year: "2021",
+      month: "3",
+      day: "4",
+    });
   },
   computed: {
     dateText() {
@@ -225,6 +236,23 @@ export default {
       return null;
     },
   },
+  watch: {
+    typeId: {
+      // 枠の変更で時間帯option変更
+      immediate: true,
+      handler: function (newVal) {
+        if (newVal) {
+          this.getTimeRangeByTypeid(newVal.id).then((result) => {
+            this.timeRangeOptions = this.getActiveTables(result.detail);
+            // select用の文字列追加
+            this.timeRangeOptions.forEach((element) => {
+              element.range = `${element.start} 〜 ${element.end}`;
+            });
+          });
+        }
+      },
+    },
+  },
   methods: {
     validate() {
       this.$refs.form.validate();
@@ -234,65 +262,65 @@ export default {
         }
       });
     },
-    setDateRange(date) {
-      this.$refs.menu.save(date);
-      //日付が変更されたら時間帯の選択肢をリセットしてから取得する
-      this.timeRangeOptions = [];
-      this.timeRange = "";
-      this.getTimeRangeOptions(this.date);
+
+    async getTypeids() {
+      // 枠データ取得、nameでsortしてset
+      const _typeIds = await Typeids().get();
+      return this.funcManageTable.sortTypesByName(_typeIds);
     },
-    async getTimeRangeOptions(value) {
-      if (value) {
-        const dateStr = value.split("-");
+
+    async setDateRange(date) {
+      this.$refs.menu.save(date);
+      //日付が変更されたら時間帯、枠の選択肢をリセットしてから取得する
+      this.resetSelectOptions();
+      this.timeRangeByDate = await this.getTimeRangeByDate(this.date);
+      // async/await または nexttick だと
+      // this.timeRangeByDate の子要素への参照がなぜか undef になる ↓
+      setTimeout(this.updateTypeids, 800);
+    },
+
+    async getTimeRangeByDate(_date) {
+      // 選択日の予約可能な時間帯をapiから取得
+      if (_date) {
+        const dateStr = _date.split("-");
         const yearStr = dateStr[0];
         const monthStr = dateStr[1];
         const dayStr = dateStr[2];
 
-        const jsMonth = monthStr - 1; //月が0始まりなので1引いておく
-
-        //日付から曜日を取得
-        const daysOfWeekStr = [
-          "Sunday",
-          "Monday",
-          "Tuesday",
-          "Wednesday",
-          "Thursday",
-          "Friday",
-          "Saturday",
-        ];
-        const date = new Date(yearStr, jsMonth, dayStr);
-        const dayOfWeek = daysOfWeekStr[date.getDay()];
-
-        // 予約可能な時間帯を取得
-        const timeRangeByDate = await Reserves().getReservableTime({
+        return await Reserves().getReservableTime({
           year: yearStr,
           month: monthStr,
           day: dayStr,
         });
-
-        let timeRangeByDayOfWeek = await ConfigReserve().getDayOfWeek(
-          dayOfWeek
-        );
-
-        //日付指定でタイムテーブルがない場合は曜日指定のタイムテーブルを取得する
-        if (timeRangeByDate) {
-          const activeTables = this.getActiveTables(timeRangeByDate.detail);
-          this.timeRangeOptions = activeTables;
-          // 空き時間帯がない場合は通知
-          if (activeTables.length == 0) {
-            this.notReservable = true;
-          }
-        } else {
-          this.timeRangeOptions = this.getActiveTables(
-            timeRangeByDayOfWeek.detail
-          );
-        }
-
-        _.forEach(this.timeRangeOptions, function (value) {
-          value.range = `${value.start} 〜 ${value.end}`;
-        });
       }
     },
+
+    async getTimeRangeByTypeid(typeidId) {
+      if (typeidId) {
+        return await this.timeRangeByDate[typeidId];
+      }
+    },
+
+    async updateTypeids() {
+      // 予約可能時間帯がない時間枠を選択肢から削除
+      const _typeIdReservableKeys = Object.keys(this.timeRangeByDate).map(
+        (key) => {
+          return parseInt(key);
+        }
+      );
+      this.typeIds = this.typeIdsReset.filter((key) => {
+        return _typeIdReservableKeys.includes(key.id);
+      });
+    },
+
+    resetSelectOptions() {
+      // 選択optionを初期化
+      this.timeRangeOptions = [];
+      this.timeRange = "";
+      this.typeId = null;
+      this.typeIds = this.typeIdsReset;
+    },
+
     async setNewReservation() {
       const params = {
         email: this.email,
