@@ -203,17 +203,19 @@ export const Reserves = () => {
     }
 
     // 時間枠ごとに予約可能時間帯を取得
-    let free_time_frames_by_typeid = {}
-    typeidsIds.forEach(typeid => {
-      getFreeTimeFrameByTypeid(typeid).then((result) => {
-        if (result) {
-          free_time_frames_by_typeid[typeid] = result
-        }
-      })
-    });
+    return new Promise((resolved) => {
+      let free_time_frames_by_typeid = {}
+      typeidsIds.forEach(typeid => {
+        getFreeTimeFrameByTypeid(typeid).then((result) => {
+          if (result) {
+            free_time_frames_by_typeid[typeid] = result
+          }
+        })
+      });
 
-    // console.log("free_time_frames_by_typeid", free_time_frames_by_typeid)
-    return free_time_frames_by_typeid;
+      // console.log("free_time_frames_by_typeid", free_time_frames_by_typeid)
+      resolved(free_time_frames_by_typeid);
+    });
   };
 
   /**
