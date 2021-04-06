@@ -2,6 +2,7 @@ import firebase from "firebase";
 import { encrypt } from "./util/Encrypt.js";
 import { ConfigReserve } from "./ConfigReserve.js";
 import { DAY_OF_WEEK } from "./statics.js";
+import { Typeids } from "./api.js";
 
 /*
 {
@@ -82,6 +83,14 @@ export const Reserves = () => {
     });
   };
 
+
+  /**
+  * 予約可能な時間帯を枠ごとに返す
+  * 空きがない枠は返さない
+  * @param {string*null} year //"01"とか２桁の文字列
+  * @param {string*null} month //"01"とか２桁の文字列
+  * @param {string*null} day //"01"とか２桁の文字列
+  */
   const getReservableTime = async ({ year, month, day }) => {
     //曜日設定から取得
     const getFreeTimeFrameFromConfigDayOfWeek = async ({
@@ -142,37 +151,69 @@ export const Reserves = () => {
       });
     };
 
+    // 時間枠idを取得
+    const _typeids = await Typeids().get();
+    const typeidsIds = _typeids.map(type => {
+      return type.id
+    });
+
     //予約状況を取得
-    const currentReserve = await getReserves({
+    const _reserves = await getReserves({
       year,
       month,
       day,
     });
 
-    //日付から取得
-    const free_time_frame_date = await getFreeTimeFrameFromConfigDate({
-      year,
-      month,
-      day,
-      currentReserve,
-    });
+    const getFreeTimeFrameByTypeid = async (typeid) => {
+      // 予約データをtype_idでfilter
+      const currentReserve = _reserves.filter(reserve => {
+        return reserve.type_id == typeid
+      })
 
-    //曜日設定から取得
-    const free_time_frame_day = await getFreeTimeFrameFromConfigDayOfWeek({
-      year,
-      month,
-      day,
-      currentReserve,
-    });
-
-    let free_time_frame = free_time_frame_date || free_time_frame_day;
-
-    return new Promise((resolved) => {
-      resolved({
-        active: free_time_frame ? true : false,
-        detail: free_time_frame,
+      //日付から取得
+      const free_time_frame_date = await getFreeTimeFrameFromConfigDate({
+        year,
+        month,
+        day,
+        currentReserve,
       });
+
+      //曜日設定から取得
+      const free_time_frame_day = await getFreeTimeFrameFromConfigDayOfWeek({
+        year,
+        month,
+        day,
+        currentReserve,
+      });
+
+      let free_time_frame = free_time_frame_date || free_time_frame_day;
+
+      // 空き時間帯がない枠のデータを返さない
+      const free_time_frame_numbers = free_time_frame.filter(frame => {
+        return frame.active;
+      }).length;
+      if (free_time_frame_numbers < 1) { return false }
+
+      return new Promise((resolved) => {
+        resolved({
+          active: free_time_frame ? true : false,
+          detail: free_time_frame,
+        });
+      });
+    }
+
+    // 時間枠ごとに予約可能時間帯を取得
+    let free_time_frames_by_typeid = {}
+    typeidsIds.forEach(typeid => {
+      getFreeTimeFrameByTypeid(typeid).then((result) => {
+        if (result) {
+          free_time_frames_by_typeid[typeid] = result
+        }
+      })
     });
+
+    // console.log("free_time_frames_by_typeid", free_time_frames_by_typeid)
+    return free_time_frames_by_typeid;
   };
 
   /**
