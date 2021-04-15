@@ -115,7 +115,7 @@ export const Reserves = () => {
       if (!currentReserve) return configDayOfWeek.detail;
 
       //絞り込み
-      return configDayOfWeek.detail.filter((time_frame) => {
+      return await configDayOfWeek.detail.filter((time_frame) => {
         const reserved = currentReserve.find((reserve) => {
           return time_frame.active && time_frame.start === reserve.start_time;
         });
@@ -203,18 +203,16 @@ export const Reserves = () => {
     }
 
     // 時間枠ごとに予約可能時間帯を取得
-    return new Promise((resolved) => {
-      let free_time_frames_by_typeid = {}
-      typeidsIds.forEach(typeid => {
-        getFreeTimeFrameByTypeid(typeid).then((result) => {
-          if (result) {
-            free_time_frames_by_typeid[typeid] = result
-          }
-        })
-      });
+    const reqArr = typeidsIds.map(
+      async typeidsIds => await getFreeTimeFrameByTypeid(typeidsIds)
+    );
 
-      // console.log("free_time_frames_by_typeid", free_time_frames_by_typeid)
-      resolved(free_time_frames_by_typeid);
+    return Promise.all([...reqArr]).then(results => {
+      let free_time_frames_by_typeid = {}
+      results.forEach((result, index) => {
+        free_time_frames_by_typeid[typeidsIds[index]] = results[index];
+      });
+      return free_time_frames_by_typeid;
     });
   };
 
