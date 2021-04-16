@@ -13,7 +13,9 @@
           <v-icon>{{ mdiClose }}</v-icon>
         </v-btn>
         <v-spacer></v-spacer>
-        <v-btn depressed @click.stop="update">更新</v-btn>
+        <v-btn depressed @click.stop="update" :disabled="disableUpdate"
+          >更新</v-btn
+        >
       </v-list-item>
 
       <v-list-item>
@@ -102,6 +104,7 @@
             filled
             dense
             :loading="loadingTimeOptions"
+            :disabled="disableTimeRangeOptions"
             return-object
           ></v-select>
         </v-list-item-content>
@@ -150,6 +153,8 @@ export default {
     typeIdsReset: [], // すべての時間枠リスト（予約不可枠を含む）
     funcManageTable: funcManageTable,
     reservableByDate: {},
+    notAvailableMessage: "空き時間帯なし",
+    disableTimeRangeOptions: false,
   }),
   props: {
     editorOpen: { type: Boolean, default: false },
@@ -185,12 +190,10 @@ export default {
         this.reservation.date
       );
       // 時間枠を更新
-      setTimeout(this.initTypeids, 800, this.reservation.type_id);
+      this.initTypeids(this.reservation.type_id);
 
       // 現予約枠の時間帯をset
-      setTimeout(this.initTimeRangeOptions, 1000, this.reservation.type_id);
-
-      // console.log("予約情報", this.id, this.reservation);
+      setTimeout(this.initTimeRangeOptions, 300);
 
       //初期値をセット
       this.email = this.reservation.user_mail;
@@ -198,11 +201,10 @@ export default {
     },
 
     typeId: {
-      // on 時間枠変
-      immediate: true,
-      handler: function (newVal) {
-        if (newVal) {
-          this.timeRangeOptions = [];
+      // on 時間枠変更
+      handler: function (newVal, oldVal) {
+        // drawer open時(oldVal == null)は発火させない
+        if (newVal && oldVal) {
           this.updateTimeRangeOptions(newVal.id);
         }
       },
@@ -214,32 +216,31 @@ export default {
       this.$refs.menu.save(date);
       this.resetSelectOptions();
       this.reservableByDate = await this.getReservableByDate(date);
-      setTimeout(this.updateTypeids, 800);
+      this.typeId = this.typeIds[0];
+      this.updateTimeRangeOptions(this.typeId);
     },
 
     //
-    async initTimeRangeOptions(reservationTypeid) {
+    async initTimeRangeOptions() {
       // 枠の時間帯を読み込んでoptionにset
-      if (reservationTypeid && this.reservableByDate) {
-        // 現予約枠に空き時間帯がない場合は、getReservableTtime apiに keyが存在しないので追加
-        if (!this.reservableByDate[reservationTypeid]) {
-          this.reservableByDate[reservationTypeid] = {
-            active: true,
-            detail: [],
-          };
+      if (this.reservableByDate) {
+        // 現予約枠に空き時間帯あれば読み込み
+        const reservedHasOpenTimeRange = this.reservableByDate[
+          this.reservation.type_id
+        ];
+        if (reservedHasOpenTimeRange) {
+          this.timeRangeOptions = await this.getActiveTables(
+            this.reservableByDate[this.reservation.type_id].detail
+          );
         }
-        this.timeRangeOptions = await this.getActiveTables(
-          this.reservableByDate[reservationTypeid].detail
-        );
-
         // 現予約の時間帯を追加
         this.timeRangeOptions.push(this.timeRangeFormat(this.reservation));
-
         // select表示用文字列追加
-        _.forEach(this.timeRangeOptions, function (value) {
-          value.range = `${value.start} 〜 ${value.end}`;
-        });
+        this.addSelectRangeToOptions();
       }
+      // start時間順に並び替え
+      this.timeRangeOptions = this.sortTimesByStartTime(this.timeRangeOptions);
+
       // 現予約時間を初期値としてset
       this.timeRange = _.find(this.timeRangeOptions, [
         "start",
@@ -247,24 +248,29 @@ export default {
       ]);
     },
 
-    async updateTimeRangeOptions(_typeid) {
-      // 現予約枠に予約可能時間が存在しない場合は処理不要
-      const typeidIsNotReservable =
-        typeof this.reservableByDate[_typeid] == "undefined";
-      if (typeidIsNotReservable) {
-        return;
-      }
+    async updateTimeRangeOptions(typeid) {
+      this.timeRangeOptions = [];
+      this.disableTimeRangeOptions = false;
 
-      if (_typeid && this.reservableByDate) {
-        // 時間枠get
+      // 選択した時間枠の空き時間帯の有無で条件分岐
+      if (this.reservableByDate[typeid]) {
+        // 空き時間帯ある場合 → 時間枠get
         this.timeRangeOptions = await this.getActiveTables(
-          this.reservableByDate[_typeid].detail
+          this.reservableByDate[typeid].detail
         );
-
         // select表示用文字列追加
-        _.forEach(this.timeRangeOptions, function (value) {
-          value.range = `${value.start} 〜 ${value.end}`;
-        });
+        this.addSelectRangeToOptions();
+      } else {
+        // 空き時間帯がない場合
+        if (typeid === this.reservation.type_id) {
+          // 現予約枠を再選択した場合は現予約時間帯を表示
+          this.timeRangeOptions.push(this.timeRangeFormat(this.reservation));
+          this.addSelectRangeToOptions();
+        } else {
+          // 変更した枠に空き時間帯がない場合
+          this.timeRangeOptions = [{ range: [this.notAvailableMessage] }];
+          this.disableTimeRangeOptions = true;
+        }
       }
       // 一番上の値を初期値としてset
       this.timeRange = this.timeRangeOptions[0];
@@ -332,41 +338,34 @@ export default {
       this.typeIds = this.typeIdsReset;
     },
 
-    async initTypeids(_typeid) {
-      // 予約可能時間帯がない時間枠を選択肢から削除
-      const _typeIdReservableKeys = Object.keys(this.reservableByDate).map(
-        (key) => {
-          return parseInt(key);
-        }
-      );
-      this.typeIds = this.typeIdsReset.filter((key) => {
-        return _typeIdReservableKeys.includes(key.id);
-      });
-      // 現予約枠が含まれていない場合は追加
+    initTypeids(_typeid) {
+      // 全予約枠を選択リストにコピー
+      this.typeIds = this.typeIdsReset;
+
+      // 現予約枠を初期値としてset
       const _id = parseInt(_typeid);
       const reservedType = this.typeIdsReset.find((_type) => {
         return _type.id == _id;
       });
-      if (!_typeIdReservableKeys.includes(_id)) {
-        this.typeIds.push(reservedType);
-        this.typeIds = this.funcManageTable.sortTypesByName(this.typeIds);
-      }
-      // 現予約枠を初期値としてset
       this.typeId = reservedType;
     },
 
-    async updateTypeids() {
-      // 予約可能時間帯がない時間枠を選択肢から削除
-      const _typeIdReservableKeys = Object.keys(this.reservableByDate).map(
-        (key) => {
-          return parseInt(key);
+    sortTimesByStartTime(times) {
+      times.sort((a, b) => {
+        if (a.start < b.start) {
+          return -1;
+        } else {
+          return 1;
         }
-      );
-      this.typeIds = this.typeIdsReset.filter((key) => {
-        return _typeIdReservableKeys.includes(key.id);
       });
-      // 一番上の値を初期値としてset
-      this.typeId = this.typeIds[0];
+      return times;
+    },
+
+    addSelectRangeToOptions() {
+      // 時間帯selectに表示用文字列を追加
+      _.forEach(this.timeRangeOptions, function (value) {
+        value.range = `${value.start} 〜 ${value.end}`;
+      });
     },
   },
   computed: {
@@ -375,6 +374,25 @@ export default {
     },
     loadingTimeOptions() {
       return this.timeRangeOptions.length === 0 ? true : false;
+    },
+    disableUpdate() {
+      // 更新ボタンバリデーション
+      if (!this.date || !this.typeId || !this.timeRange) {
+        return true;
+      }
+      if (this.disableTimeRangeOptions) {
+        return true;
+      }
+      // 現予約内容から変更されたか
+      if (
+        this.date != this.reservation.date ||
+        this.typeId.id != this.reservation.type_id ||
+        this.timeRange.start != this.reservation.start_time
+      ) {
+        return false;
+      } else {
+        return true;
+      }
     },
   },
 };

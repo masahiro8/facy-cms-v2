@@ -71,7 +71,8 @@
           :items="timeRangeOptions"
           item-text="range"
           item-value="timeid"
-          label="時間帯"
+          :label="timeRangeLabel"
+          :disabled="disableTimeRange"
           return-object
         ></v-select>
 
@@ -166,17 +167,6 @@
         </v-sheet>
       </v-card>
     </v-dialog>
-    <!-- 空き時間なしメッセージ -->
-    <!-- <v-dialog v-model="notReservable" persistent max-width="500">
-      <v-card class="pa-4">
-        <v-card-title class="text-center"
-          >この日には予約可能な時間枠がありませ</v-card-title
-        >
-        <v-card-actions>
-          <v-btn block large text @click="notReservable = false"> 戻る </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog> -->
   </v-sheet>
 </template>
 
@@ -202,7 +192,6 @@ export default {
     timeRangeOptions: [],
     timeRules: [(v) => !!v || "時間帯を選択してください"],
     message: false,
-    // notReservable: false,
     typeId: null,
     typeIdRules: [(v) => !!v || "時間枠を選択してください"],
     typeIds: [], // 時間枠の選択肢
@@ -211,6 +200,8 @@ export default {
     timeRangeByDate: {},
     typeIdsHasTimeReservable: {},
     testA: {},
+    disableTimeRange: false,
+    timeRangeLabel: "時間帯",
   }),
   async mounted() {
     // 枠データ取得
@@ -237,11 +228,18 @@ export default {
       handler: function (newVal) {
         if (newVal) {
           this.getTimeRangeByTypeid(newVal.id).then((result) => {
-            this.timeRangeOptions = this.getActiveTables(result.detail);
-            // select用の文字列追加
-            this.timeRangeOptions.forEach((element) => {
-              element.range = `${element.start} 〜 ${element.end}`;
-            });
+            // 空き時間がある
+            if (result) {
+              this.resetTimeRangeSelect();
+              this.timeRangeOptions = this.getActiveTables(result.detail);
+              // select用の文字列追加
+              this.timeRangeOptions.forEach((element) => {
+                element.range = `${element.start} 〜 ${element.end}`;
+              });
+            } else {
+              // 空き時間がない
+              this.disableTimeRangeSelect();
+            }
           });
         }
       },
@@ -268,9 +266,7 @@ export default {
       //日付が変更されたら時間帯、枠の選択肢をリセットしてから取得する
       this.resetSelectOptions();
       this.timeRangeByDate = await this.getTimeRangeByDate(this.date);
-      // async/await または nexttick だと
-      // this.timeRangeByDate の子要素への参照がなぜか undef になる ↓
-      setTimeout(this.updateTypeids, 800);
+      // this.updateTypeids();
     },
 
     async getTimeRangeByDate(_date) {
@@ -293,18 +289,6 @@ export default {
       if (typeidId) {
         return await this.timeRangeByDate[typeidId];
       }
-    },
-
-    async updateTypeids() {
-      // 予約可能時間帯がない時間枠を選択肢から削除
-      const _typeIdReservableKeys = Object.keys(this.timeRangeByDate).map(
-        (key) => {
-          return parseInt(key);
-        }
-      );
-      this.typeIds = this.typeIdsReset.filter((key) => {
-        return _typeIdReservableKeys.includes(key.id);
-      });
     },
 
     resetSelectOptions() {
@@ -335,6 +319,17 @@ export default {
     getActiveTables(detail) {
       // active: true な時間枠だけ返す
       return detail.filter((table) => table.active);
+    },
+
+    resetTimeRangeSelect() {
+      this.disableTimeRange = false;
+      this.timeRangeLabel = "時間帯";
+      this.timeRules = [(v) => !!v || "時間帯を選択してください"];
+    },
+    disableTimeRangeSelect() {
+      this.disableTimeRange = true;
+      this.timeRangeLabel = "空き時間がありません";
+      this.timeRules = [""];
     },
   },
 };
